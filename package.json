@@ -16,6 +16,7 @@
     "webpack": "^2.3.2"
   },
   "dependencies": {
+    "clone": "^2.1.1",
     "events": "^1.1.1"
   }
 }
