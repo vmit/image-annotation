@@ -9,6 +9,14 @@
 
 <script>
     var container = document.getElementById('container');
+    var editor = new ImageAnnotationEditor([
+        {
+            type: 'polygon',
+            data: [ { x: 10, y: 100 }, { x: 240, y: 30 }, { x: 30, y: 12 } ]
+        }
+    ]);
+
+    editor.renderInto(container);
 
 </script>
 
