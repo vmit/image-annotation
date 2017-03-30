@@ -32,7 +32,8 @@ export default class Editor {
 
         this._el.polygon.addEventListener('click', () => {
             this._canvasPosition = this._el.canvas.getBoundingClientRect();
-            this._activeShapeEditor = new NewPolygonEditor(this._el.canvas);
+            this._activeShapeEditor = new NewPolygonEditor();
+            this._activeShapeEditor.appendToCanvas(this._el.canvas);
             this._activeShapeEditor.render();
             this._activeShapeEditor.on('shape:new', this.onNewShape.bind(this));
         });
@@ -50,7 +51,8 @@ export default class Editor {
             if (this._activeShapeEditor) {
                 this._activeShapeEditor.onCanvasMouseMove(
                     e.clientX - this._canvasPosition.left,
-                    e.clientY - this._canvasPosition.top);
+                    e.clientY - this._canvasPosition.top
+                );
             }
         });
 
@@ -74,6 +76,8 @@ export default class Editor {
             return;
         }
 
-        new ShapeEditorClass(this._el.canvas, shape).render();
+        const shapeEditor = new ShapeEditorClass(shape);
+        shapeEditor.render();
+        shapeEditor.appendToCanvas(this._el.canvas);
     }
 }

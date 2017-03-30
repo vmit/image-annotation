@@ -8,8 +8,8 @@ import SvgPolyline from '../utils/svg/svg-polyline';
 
 export class PolygonEditor extends BaseShapeEditor {
 
-    constructor(canvas, shape) {
-        super(canvas, shape);
+    constructor(shape) {
+        super(shape);
     }
 
     render() {
@@ -21,10 +21,10 @@ export class PolygonEditor extends BaseShapeEditor {
 
 }
 
-export class NewPolygonEditor extends PolygonEditor {
+export class NewPolygonEditor extends BaseShapeEditor {
 
-    constructor(canvas) {
-        super(canvas, { type: 'polygon', data: []});
+    constructor() {
+        super({ type: 'polygon', data: [] }, 'new-polygon');
 
         this._polyline = new SvgPolyline([]);
         this._activeLine = new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 });
@@ -37,7 +37,7 @@ export class NewPolygonEditor extends PolygonEditor {
         if (this.shape.data.length == 0) {
             svgPoint.el.addEventListener('click', () => {
                 this.emit('shape:new', this.shape);
-                this.clear();
+                this.removeFromCanvas();
             });
         }
 

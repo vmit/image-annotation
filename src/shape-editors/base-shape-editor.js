@@ -1,31 +1,36 @@
 import EventEmitter from 'events';
+import SvgGroup from '../utils/svg/svg-g';
 
 
 export default class BaseShapeEditor extends EventEmitter {
+    get container() { return this._container; }
     get shape() { return this._shape; }
-    get canvas() { return this._canvas; }
 
-    constructor(canvas, shape) {
+    constructor(shape, name) {
         super();
 
-        this._canvas = canvas;
+        this._container = new SvgGroup();
         this._shape = shape;
-        this._elements = [];
+        this._canvas = null;
+
+        this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${name || shape.type}`);
     }
 
     /**
      * @param {BaseSvgElementWrapper} element
      */
     append(element) {
-        this._elements.push(element);
-        this.canvas.appendChild(element.el);
+        this.container.el.appendChild(element.el);
     }
 
-    clear() {
-        this._elements.forEach((element) => {
-            this.canvas.removeChild(element.el);
-        });
-        this._elements = [];
+    appendToCanvas(canvas) {
+        this._canvas = canvas;
+        this._canvas.appendChild(this.container.el);
+    }
+
+    removeFromCanvas() {
+        this._canvas.removeChild(this.container.el);
+        this._canvas = null;
     }
 
     onCanvasClick(x, y) {}
