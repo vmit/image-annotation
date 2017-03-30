@@ -1,0 +1,12 @@
+.image-annotation-editor__canvas * {
+    stroke: red;
+    fill: yellow;
+    stroke-width: 1px;
+}
+.image-annotation-editor__canvas .ia-svg-element-point {
+    fill: red;
+    stroke-width: 4px;
+}
+.image-annotation-editor__canvas .ia-svg-element-point:hover {
+    stroke-width: 8px;
+}

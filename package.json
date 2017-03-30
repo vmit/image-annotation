@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "clone": "^2.1.1",
-    "events": "^1.1.1"
+    "css-loader": "^0.27.3",
+    "events": "^1.1.1",
+    "style-loader": "^0.16.1"
   }
 }

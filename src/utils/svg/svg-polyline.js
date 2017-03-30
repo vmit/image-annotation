@@ -8,10 +8,9 @@ export default class SvgPolyline extends BaseSvgElementWrapper {
 
     /**
      * @param points
-     * @param style
      */
-    constructor(points, style) {
-        super('polyline', style);
+    constructor(points) {
+        super('polyline');
 
         this.points = points;
     }

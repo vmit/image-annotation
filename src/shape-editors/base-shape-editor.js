@@ -4,14 +4,12 @@ import EventEmitter from 'events';
 export default class BaseShapeEditor extends EventEmitter {
     get shape() { return this._shape; }
     get canvas() { return this._canvas; }
-    get style() { return this._style; }
 
-    constructor(canvas, shape, style) {
+    constructor(canvas, shape) {
         super();
 
         this._canvas = canvas;
         this._shape = shape;
-        this._style = style;
         this._elements = [];
     }
 

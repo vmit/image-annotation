@@ -14,10 +14,9 @@ export default class SvgPolygon extends BaseSvgElementWrapper {
     /**
      * @param start
      * @param end
-     * @param style
      */
-    constructor(start, end, style) {
-        super('line', style);
+    constructor(start, end) {
+        super('line');
 
         this.start = start;
         this.end = end;

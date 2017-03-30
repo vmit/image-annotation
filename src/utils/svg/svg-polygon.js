@@ -8,10 +8,9 @@ export default class SvgPolygon extends BaseSvgElementWrapper {
 
     /**
      * @param points
-     * @param style
      */
-    constructor(points, style) {
-        super('polygon', style);
+    constructor(points) {
+        super('polygon');
 
         this.points = points;
     }

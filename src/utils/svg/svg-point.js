@@ -1,4 +1,3 @@
-import clone from 'clone';
 import BaseSvgElementWrapper from './base-svg-element-wrapper';
 
 
@@ -10,19 +9,12 @@ export default class SvgPoint extends BaseSvgElementWrapper {
 
     /**
      * @param point
-     * @param style
      */
-    constructor(point, style) {
-        super('circle', SvgPoint.updateStyles(style));
+    constructor(point) {
+        super('circle', 'point');
 
         this.set('r', 1);
-
         this.point = point;
     }
 
-    static updateStyles(styles) {
-        styles = clone(styles);
-        styles.strokeWidth = parseInt(styles.strokeWidth || 1) * 2;
-        return styles;
-    }
 }

@@ -8,14 +8,14 @@ import SvgPolyline from '../utils/svg/svg-polyline';
 
 export class PolygonEditor extends BaseShapeEditor {
 
-    constructor(canvas, shape, style) {
-        super(canvas, shape, style);
+    constructor(canvas, shape) {
+        super(canvas, shape);
     }
 
     render() {
-        this.append(new SvgPolygon(this.shape.data, this.style));
+        this.append(new SvgPolygon(this.shape.data));
         this.shape.data.forEach((point) =>
-            this.append(new SvgPoint(point, this.style))
+            this.append(new SvgPoint(point))
         );
     }
 
@@ -23,20 +23,21 @@ export class PolygonEditor extends BaseShapeEditor {
 
 export class NewPolygonEditor extends PolygonEditor {
 
-    constructor(canvas, style) {
-        super(canvas, { type: 'polygon', data: []}, style);
+    constructor(canvas) {
+        super(canvas, { type: 'polygon', data: []});
 
-        this._polyline = new SvgPolyline([], style);
-        this._activeLine = new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }, style);
+        this._polyline = new SvgPolyline([]);
+        this._activeLine = new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 });
     }
 
     onCanvasClick(x, y) {
         const point = {x, y};
-        const svgPoint = new SvgPoint(point, this.style);
+        const svgPoint = new SvgPoint(point);
 
         if (this.shape.data.length == 0) {
             svgPoint.el.addEventListener('click', () => {
                 this.emit('shape:new', this.shape);
+                this.clear();
             });
         }
 

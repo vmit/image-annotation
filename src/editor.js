@@ -1,7 +1,8 @@
 import editorMarkup from './editor.html';
 import Keys from './utils/keys';
 import {PolygonEditor, NewPolygonEditor} from './shape-editors/polygon-editor';
-import DEFAULT_SHAPE_STYLE  from './default-shapes-style.json';
+import './styles/editor.css';
+import './styles/shapes.svg.css';
 
 
 const SHAPE_EDITORS = {
@@ -29,7 +30,7 @@ export default class Editor {
         this._el.polygon = container.querySelector('.image-annotation-editor__shape-polygon');
 
         this._el.polygon.addEventListener('click', () => {
-            this._activeShapeEditor = new NewPolygonEditor(this._el.canvas, DEFAULT_SHAPE_STYLE);
+            this._activeShapeEditor = new NewPolygonEditor(this._el.canvas);
             this._activeShapeEditor.render();
             this._activeShapeEditor.on('shape:new', this.onNewShape.bind(this));
         });
@@ -66,6 +67,6 @@ export default class Editor {
             return;
         }
 
-        new ShapeEditorClass(this._el.canvas, shape, DEFAULT_SHAPE_STYLE).render();
+        new ShapeEditorClass(this._el.canvas, shape).render();
     }
 }
