@@ -15,6 +15,7 @@ export default class Editor {
         this._el = {};
         this._shapes = shapes;
         this._activeShapeEditor = null;
+        this._canvasPosition = null;
     }
 
     onNewShape(shape) {
@@ -30,6 +31,7 @@ export default class Editor {
         this._el.polygon = container.querySelector('.image-annotation-editor__shape-polygon');
 
         this._el.polygon.addEventListener('click', () => {
+            this._canvasPosition = this._el.canvas.getBoundingClientRect();
             this._activeShapeEditor = new NewPolygonEditor(this._el.canvas);
             this._activeShapeEditor.render();
             this._activeShapeEditor.on('shape:new', this.onNewShape.bind(this));
@@ -37,13 +39,18 @@ export default class Editor {
 
         this._el.canvas.addEventListener('click', (e) => {
             if (this._activeShapeEditor) {
-                this._activeShapeEditor.onCanvasClick(e.offsetX, e.offsetY);
+                this._activeShapeEditor.onCanvasClick(
+                    e.clientX - this._canvasPosition.left,
+                    e.clientY - this._canvasPosition.top
+                );
             }
         });
 
         this._el.canvas.addEventListener('mousemove', (e) => {
             if (this._activeShapeEditor) {
-                this._activeShapeEditor.onCanvasMouseMove(e.offsetX, e.offsetY);
+                this._activeShapeEditor.onCanvasMouseMove(
+                    e.clientX - this._canvasPosition.left,
+                    e.clientY - this._canvasPosition.top);
             }
         });
 
