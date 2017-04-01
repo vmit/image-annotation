@@ -26,6 +26,9 @@ export default class Editor {
 
         this._el.polygon.addEventListener('click', () => {
             this._canvasPosition = this._el.canvas.getBoundingClientRect();
+            if (this._activeShapeEditor) {
+                this._activeShapeEditor.onDeactivated();
+            }
             this._activeShapeEditor = new NewPolygonEditor();
             this._activeShapeEditor.appendToCanvas(this._el.canvas);
             this._activeShapeEditor.render();
@@ -63,13 +66,28 @@ export default class Editor {
         });
     }
 
+    _onShapeEditorActivate(shapeEditor) {
+        if (this._activeShapeEditor) {
+            this._activeShapeEditor.onDeactivated();
+        }
+        this._canvasPosition = this._el.canvas.getBoundingClientRect();
+        this._activeShapeEditor = shapeEditor;
+    }
+
+    _onShapeEditorDeactivate(shapeEditor) {
+        this._activeShapeEditor.onDeactivated();
+        this._activeShapeEditor = null;
+    }
+
     _onNewShape(shape) {
+        this._activeShapeEditor.onDeactivated();
         this._activeShapeEditor = null;
         this._shapes.push(shape);
         this._renderShape(shape);
     }
 
     _onCancelShape(shape) {
+        this._activeShapeEditor.onDeactivated();
         this._activeShapeEditor = null;
     }
 
@@ -84,5 +102,8 @@ export default class Editor {
         const shapeEditor = new ShapeEditorClass(shape);
         shapeEditor.render();
         shapeEditor.appendToCanvas(this._el.canvas);
+
+        shapeEditor.on('shape:editor:activate', this._onShapeEditorActivate.bind(this));
+        shapeEditor.on('shape:editor:deactivate', this._onShapeEditorDeactivate.bind(this));
     }
 }

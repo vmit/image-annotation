@@ -12,11 +12,56 @@ export class PolygonEditor extends BaseShapeEditor {
         super(shape);
     }
 
+    onCanvasMouseMove(x, y) {
+        if (this._el.draggablePoint) {
+            this._el.draggablePoint.point = { x, y }
+            this._el.polygon.points = this.shape.data;
+        }
+    }
+
+    onDeactivated() {
+        if (this._el.activePoint) {
+            this._el.activePoint.removeClass('ia-active-point');
+        }
+        if (this._el.draggablePoint) {
+            this._el.draggablePoint.removeClass('ia-active-point');
+        }
+    }
+
     render() {
-        this.append(new SvgPolygon(this.shape.data));
-        this.shape.data.forEach((point) =>
-            this.append(new SvgPoint(point))
-        );
+        this._el = {
+            activePoint: null,
+            draggablePoint: null,
+            polygon: new SvgPolygon(this.shape.data)
+        };
+
+        this.append(this._el.polygon);
+        this.shape.data.forEach((point) => {
+            const pointElement = new SvgPoint(point);
+            this.append(pointElement);
+
+            // TODO: refactor this spaghetti
+            pointElement.el.addEventListener('click', (e) => {
+                if (this._el.activePoint) {
+                    this._el.activePoint.removeClass('ia-active-point');
+                }
+                this._el.activePoint = pointElement;
+                this.emit('shape:editor:activate', this);
+                pointElement.addClass('ia-active-point');
+            });
+            pointElement.el.addEventListener('mousedown', (e) => {
+                if (this._el.activePoint) {
+                    this._el.activePoint.removeClass('ia-active-point');
+                }
+                this._el.draggablePoint = pointElement;
+                pointElement.addClass('ia-active-point');
+                this.emit('shape:editor:activate', this);
+            });
+            pointElement.el.addEventListener('mouseup', () => {
+                this._el.draggablePoint = null
+                pointElement.removeClass('ia-active-point');
+            });
+        });
     }
 }
 

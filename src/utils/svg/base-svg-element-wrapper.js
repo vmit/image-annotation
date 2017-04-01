@@ -17,6 +17,10 @@ export default class BaseSvgElementWrapper {
         this.set('class', `${this.get('class') || ''} ${className}`);
     }
 
+    removeClass(className) {
+        this.set('class', `${(this.get('class') || '').replace(className, '')}`);
+    }
+
     get(attribute) {
         return this._el.getAttribute(attribute);
     }

@@ -25,6 +25,10 @@
     stroke-width: 4px;
 }
 
+.image-annotation-editor__canvas .ia-shape-polygon .ia-active-point {
+    stroke-width: 4px;
+}
+
 .image-annotation-editor__canvas .ia-shape-new-polygon .ia-element-point:hover {
     stroke-width: 0px;
 }
