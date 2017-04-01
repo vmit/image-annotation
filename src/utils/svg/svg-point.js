@@ -13,7 +13,7 @@ export default class SvgPoint extends BaseSvgElementWrapper {
     constructor(point) {
         super('circle', 'point');
 
-        this.set('r', 1);
+        this.set('r', 3);
         this.point = point;
     }
 

@@ -35,10 +35,8 @@ export class NewPolygonEditor extends BaseShapeEditor {
         const svgPoint = new SvgPoint(point);
 
         if (this.shape.data.length == 0) {
-            svgPoint.el.addEventListener('click', () => {
-                this.emit('shape:new', this.shape);
-                this.removeFromCanvas();
-            });
+            svgPoint.addClass('ia-first-point');
+            svgPoint.el.addEventListener('click', this._onFirstPointCLick.bind(this));
         }
 
         this.shape.data.push(point);
@@ -53,6 +51,16 @@ export class NewPolygonEditor extends BaseShapeEditor {
 
             this._activeLine.start = prevPoint;
             this._activeLine.end = { x, y };
+        }
+    }
+
+    _onFirstPointCLick(e) {
+        if (this.shape.data.length > 2) {
+            this.emit('shape:new', this.shape);
+            this.removeFromCanvas();
+        } else {
+            e.stopPropagation();
+            e.preventDefault();
         }
     }
 

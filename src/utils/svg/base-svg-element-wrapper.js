@@ -8,7 +8,13 @@ export default class BaseSvgElementWrapper {
      */
     constructor(type, name) {
         this._el = document.createElementNS("http://www.w3.org/2000/svg", type);
-        this.set('class', `ia-svg-element-${name || type}`);
+
+        this.addClass(`ia-element`);
+        this.addClass(`ia-element-${name || type}`);
+    }
+
+    addClass(className) {
+        this.set('class', `${this.get('class') || ''} ${className}`);
     }
 
     get(attribute) {
