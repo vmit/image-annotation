@@ -1,17 +1,15 @@
 import editorMarkup from './editor.html';
+import EventEmitter from 'events';
 import Keys from './utils/keys';
-import {PolygonEditor, NewPolygonEditor} from './shape-editors/polygon-editor';
+import shapeEditorFactory from './shape-editors/shape-editor-factory';
 import './styles/editor.css';
 import './styles/shapes.svg.css';
 
 
-const SHAPE_EDITORS = {
-    polygon: PolygonEditor
-}
-
-
-export default class Editor {
+export default class Editor extends EventEmitter {
     constructor(shapes = []) {
+        super();
+
         this._el = {};
         this._shapes = shapes;
         this._activeShapeEditor = null;
@@ -25,85 +23,62 @@ export default class Editor {
         this._el.polygon = container.querySelector('.image-annotation-editor__shape-polygon');
 
         this._el.polygon.addEventListener('click', () => {
-            this._canvasPosition = this._el.canvas.getBoundingClientRect();
-            if (this._activeShapeEditor) {
-                this._activeShapeEditor.onDeactivated();
-            }
-            this._activeShapeEditor = new NewPolygonEditor();
-            this._activeShapeEditor.appendToCanvas(this._el.canvas);
-            this._activeShapeEditor.render();
-            this._activeShapeEditor.on('shape:new', this._onNewShape.bind(this));
-            this._activeShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
+            this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
         });
 
-        this._el.canvas.addEventListener('click', (e) => {
-            if (this._activeShapeEditor) {
-                this._activeShapeEditor.onCanvasClick(
-                    e.clientX - this._canvasPosition.left,
-                    e.clientY - this._canvasPosition.top
-                );
-            }
-        });
+        this._el.canvas.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
+            activeShapeEditor.onCanvasClick(e.clientX - this._canvasPosition.left, e.clientY - this._canvasPosition.top);
+        }));
 
-        this._el.canvas.addEventListener('mousemove', (e) => {
-            if (this._activeShapeEditor) {
-                this._activeShapeEditor.onCanvasMouseMove(
-                    e.clientX - this._canvasPosition.left,
-                    e.clientY - this._canvasPosition.top
-                );
-            }
-        });
+        this._el.canvas.addEventListener('mousemove', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
+            activeShapeEditor.onCanvasMouseMove(e.clientX - this._canvasPosition.left, e.clientY - this._canvasPosition.top);
+        }));
 
-        this._el.canvas.addEventListener('keydown', (e) => {
-            let key;
-            if (this._activeShapeEditor && (key = Keys.fromKeyCode(e.keyCode))) {
-                this._activeShapeEditor.onCanvasKeyPressed(key);
-            }
-        });
+        this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
+            let key = Keys.fromKeyCode(e.keyCode);
+            key && activeShapeEditor.onCanvasKeyPressed(key);
+        }));
 
-        this._shapes.forEach((shape) => {
-            this._renderShape(shape);
-        });
+        this._shapes.forEach((shape) => this._appendShapeEditor(shapeEditorFactory.createEditor(shape)));
     }
 
-    _onShapeEditorActivate(shapeEditor) {
-        if (this._activeShapeEditor) {
-            this._activeShapeEditor.onDeactivated();
-        }
+    _appendShapeEditor(shapeEditor) {
+        shapeEditor.render();
+        shapeEditor.appendToCanvas(this._el.canvas);
+        shapeEditor.on('shape:editor:activate', this._activateShapeEditor.bind(this, shapeEditor));
+    }
+
+    _appendNewShapeEditor(newShapeEditor) {
+        newShapeEditor.render();
+        newShapeEditor.appendToCanvas(this._el.canvas);
+        newShapeEditor.on('shape:new', this._onNewShape.bind(this));
+        newShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
+        this._activateShapeEditor(newShapeEditor);
+    }
+
+    _activateShapeEditor(shapeEditor) {
         this._canvasPosition = this._el.canvas.getBoundingClientRect();
+
         this._activeShapeEditor = shapeEditor;
+        this.emit('shape:editor:activated', shapeEditor);
+
+        if (shapeEditor != null) {
+            shapeEditor.onActivated();
+            this.once('shape:editor:activated', () => shapeEditor.onDeactivated());
+        }
     }
 
-    _onShapeEditorDeactivate(shapeEditor) {
-        this._activeShapeEditor.onDeactivated();
-        this._activeShapeEditor = null;
+    _withActiveShapeEditor(cb) {
+        this._activeShapeEditor && cb(this._activeShapeEditor);
     }
 
     _onNewShape(shape) {
-        this._activeShapeEditor.onDeactivated();
-        this._activeShapeEditor = null;
+        this._activateShapeEditor(null);
         this._shapes.push(shape);
-        this._renderShape(shape);
+        this._appendShapeEditor(shapeEditorFactory.createEditor(shape));
     }
 
     _onCancelShape(shape) {
-        this._activeShapeEditor.onDeactivated();
-        this._activeShapeEditor = null;
-    }
-
-    _renderShape(shape) {
-        const ShapeEditorClass = SHAPE_EDITORS[shape.type];
-
-        if (!ShapeEditorClass) {
-            console.warn(`Unknown shape type: ${shape.type}`);
-            return;
-        }
-
-        const shapeEditor = new ShapeEditorClass(shape);
-        shapeEditor.render();
-        shapeEditor.appendToCanvas(this._el.canvas);
-
-        shapeEditor.on('shape:editor:activate', this._onShapeEditorActivate.bind(this));
-        shapeEditor.on('shape:editor:deactivate', this._onShapeEditorDeactivate.bind(this));
+        this._activateShapeEditor(null);
     }
 }

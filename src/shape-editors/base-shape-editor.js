@@ -12,8 +12,15 @@ export default class BaseShapeEditor extends EventEmitter {
         this._container = new SvgGroup();
         this._shape = shape;
         this._canvas = null;
+        this._isActive = false;
 
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${name || shape.type}`);
+    }
+
+    activate() {
+        if (!this._isActive) {
+            this.emit('shape:editor:activate', this);
+        }
     }
 
     /**
@@ -40,12 +47,17 @@ export default class BaseShapeEditor extends EventEmitter {
         this._canvas = null;
     }
 
+    onActivated() {
+        this._isActive = true;
+    }
+
+    onDeactivated() {
+        this._isActive = false;
+    }
+
     onCanvasClick(x, y) {}
     onCanvasMouseMove(x, y) {}
     onCanvasKeyPressed(key) {}
-    onActivated() {}
-    onDeactivated() {}
-
     render() {}
-    destroy() {}
+
 }
