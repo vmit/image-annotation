@@ -18,12 +18,6 @@ export default class Editor {
         this._canvasPosition = null;
     }
 
-    onNewShape(shape) {
-        this._activeShapeEditor = null;
-        this._shapes.push(shape);
-        this.renderShape(shape);
-    }
-
     renderInto(container) {
         container.innerHTML = editorMarkup;
 
@@ -35,7 +29,8 @@ export default class Editor {
             this._activeShapeEditor = new NewPolygonEditor();
             this._activeShapeEditor.appendToCanvas(this._el.canvas);
             this._activeShapeEditor.render();
-            this._activeShapeEditor.on('shape:new', this.onNewShape.bind(this));
+            this._activeShapeEditor.on('shape:new', this._onNewShape.bind(this));
+            this._activeShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
         });
 
         this._el.canvas.addEventListener('click', (e) => {
@@ -64,11 +59,21 @@ export default class Editor {
         });
 
         this._shapes.forEach((shape) => {
-            this.renderShape(shape);
+            this._renderShape(shape);
         });
     }
 
-    renderShape(shape) {
+    _onNewShape(shape) {
+        this._activeShapeEditor = null;
+        this._shapes.push(shape);
+        this._renderShape(shape);
+    }
+
+    _onCancelShape(shape) {
+        this._activeShapeEditor = null;
+    }
+
+    _renderShape(shape) {
         const ShapeEditorClass = SHAPE_EDITORS[shape.type];
 
         if (!ShapeEditorClass) {

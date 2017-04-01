@@ -23,6 +23,13 @@ export default class BaseShapeEditor extends EventEmitter {
         this.container.el.appendChild(element.el);
     }
 
+    /**
+     * @param {BaseSvgElementWrapper} element
+     */
+    remove(element) {
+        this.container.el.removeChild(element.el);
+    }
+
     appendToCanvas(canvas) {
         this._canvas = canvas;
         this._canvas.appendChild(this.container.el);
