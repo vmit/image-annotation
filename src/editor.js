@@ -11,20 +11,26 @@ export default class Editor extends EventEmitter {
         return this._shapes;
     }
 
-    constructor(shapes = []) {
+    constructor(imageUrl, shapes = []) {
         super();
 
-        this._el = {};
+        this._imageUrl = imageUrl;
         this._shapes = shapes;
         this._activeShapeEditor = null;
         this._canvasPosition = null;
     }
 
-    renderInto(container) {
+    render(container) {
         container.innerHTML = editorMarkup;
 
+        this._el = {};
+        this._el.image = container.querySelector('.image-annotation-editor__image');
         this._el.canvas = container.querySelector('.image-annotation-editor__canvas');
         this._el.polygon = container.querySelector('.image-annotation-editor__shape-polygon');
+
+        this._el.image.addEventListener('load', () => {
+            this._shapes.forEach((shape) => this._appendShapeEditor(shapeEditorFactory.createEditor(shape)));
+        });
 
         this._el.polygon.addEventListener('click', () => {
             this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
@@ -43,7 +49,7 @@ export default class Editor extends EventEmitter {
             key && activeShapeEditor.onCanvasKeyPressed(key);
         }));
 
-        this._shapes.forEach((shape) => this._appendShapeEditor(shapeEditorFactory.createEditor(shape)));
+        this._el.image.src = this._imageUrl;
     }
 
     _appendShapeEditor(shapeEditor) {

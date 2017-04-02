@@ -5,19 +5,19 @@
     <script src="../build/image-annotation-editor.bundle.js"></script>
 </head>
 <body>
-<div id="container" style="border: 1px solid; width: 300px; height: 300px;"></div>
+<div id="container" style="border: 1px solid;"></div>
 <button id="shapes">print shapes</button>
 
 <script>
     var container = document.getElementById('container');
-    var editor = new ImageAnnotationEditor([
+    var editor = new ImageAnnotationEditor('https://media-cdn.tripadvisor.com/media/photo-s/03/9b/2f/f1/nice.jpg', [
         {
             type: 'polygon',
             data: [ { x: 0.1, y: 0.4 }, { x: 0.249933, y: 0.3 }, { x: 0.30, y: 0.12 } ]
         }
     ]);
 
-    editor.renderInto(container);
+    editor.render(container);
 
     document.getElementById('shapes').addEventListener('click', function(e) {
         console.log(editor.shapes);
