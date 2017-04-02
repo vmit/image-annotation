@@ -89,6 +89,12 @@ export class NewPolygonEditor extends BaseShapeEditor {
         }
     }
 
+    onDeactivated() {
+        super.onDeactivated();
+
+        this.removeFromCanvas();
+    }
+
     _addPoint(x, y) {
         const point = {x, y};
         const pointElement = new SvgPoint(point);
