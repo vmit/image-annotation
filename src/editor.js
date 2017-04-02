@@ -7,6 +7,10 @@ import './styles/shapes.svg.css';
 
 
 export default class Editor extends EventEmitter {
+    get shapes() {
+        return this._shapes;
+    }
+
     constructor(shapes = []) {
         super();
 

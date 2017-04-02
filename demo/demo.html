@@ -6,6 +6,7 @@
 </head>
 <body>
 <div id="container" style="border: 1px solid; width: 300px; height: 300px;"></div>
+<button id="shapes">print shapes</button>
 
 <script>
     var container = document.getElementById('container');
@@ -17,6 +18,10 @@
     ]);
 
     editor.renderInto(container);
+
+    document.getElementById('shapes').addEventListener('click', function(e) {
+        console.log(editor.shapes);
+    });
 
 </script>
 
