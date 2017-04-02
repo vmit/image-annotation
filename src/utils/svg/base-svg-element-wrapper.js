@@ -6,8 +6,9 @@ export default class BaseSvgElementWrapper {
      * @param {string} type
      * @param {string} [name]
      */
-    constructor(type, name) {
+    constructor(type, canvasSize, name) {
         this._el = document.createElementNS("http://www.w3.org/2000/svg", type);
+        this._canvasSize = canvasSize;
 
         this.addClass(`ia-element`);
         this.addClass(`ia-element-${name || type}`);
@@ -27,6 +28,20 @@ export default class BaseSvgElementWrapper {
 
     set(attribute, value) {
         this._el.setAttribute(attribute, value);
+    }
+
+    /**
+     * @param value [0..1]
+     */
+    toPxX(value) {
+        return value * this._canvasSize.width;
+    }
+
+    /**
+     * @param value [0..1]
+     */
+    toPxY(value) {
+        return value * this._canvasSize.height;
     }
 
 }

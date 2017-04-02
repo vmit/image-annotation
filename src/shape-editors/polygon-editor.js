@@ -25,7 +25,7 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _addPoint(point) {
-        const pointElement = new SvgPoint(point);
+        const pointElement = new SvgPoint(point, this.canvasSize);
         this.append(pointElement);
 
         pointElement.el.addEventListener('mousedown', this._onPointMouseDown.bind(this, pointElement));
@@ -52,11 +52,13 @@ export default class PolygonEditor extends BaseShapeEditor {
         this._el.draggablePoint = null;
     }
 
-    render() {
+    render(canvas) {
+        super.render(canvas);
+
         this._el = {
             activePoint: null,
             draggablePoint: null,
-            polygon: new SvgPolygon(this.shape.data)
+            polygon: new SvgPolygon(this.shape.data, this.canvasSize)
         };
 
         this.append(this._el.polygon);

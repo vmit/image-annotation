@@ -35,7 +35,7 @@ export default class NewPolygonEditor extends BaseShapeEditor {
 
     _addPoint(x, y) {
         const point = {x, y};
-        const pointElement = new SvgPoint(point);
+        const pointElement = new SvgPoint(point, this.canvasSize);
 
         if (this.shape.data.length == 0) {
             pointElement.addClass('ia-first-point');
@@ -55,7 +55,6 @@ export default class NewPolygonEditor extends BaseShapeEditor {
 
         if (this.shape.data.length == 0) {
             this.emit('shape:cancel', this.shape);
-            this.removeFromCanvas();
         } else {
             this._el.polyline.points = this.shape.data;
             this._el.activeLine.start = this.shape.data[this.shape.data.length - 1];
@@ -82,7 +81,6 @@ export default class NewPolygonEditor extends BaseShapeEditor {
     _closePolygon() {
         if (this.shape.data.length > 2) {
             this.emit('shape:new', this.shape);
-            this.removeFromCanvas();
 
             return true;
         }
@@ -90,10 +88,12 @@ export default class NewPolygonEditor extends BaseShapeEditor {
         return false;
     }
 
-    render() {
+    render(canvas) {
+        super.render(canvas);
+
         this._el = {
-            polyline: new SvgPolyline([]),
-            activeLine: new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }),
+            polyline: new SvgPolyline([], this.canvasSize),
+            activeLine: new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }, this.canvasSize),
             points: []
         }
 

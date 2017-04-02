@@ -1,20 +1,29 @@
 import EventEmitter from 'events';
 import SvgGroup from '../utils/svg/svg-g';
+import assert from '../utils/assert';
 
 
 export default class BaseShapeEditor extends EventEmitter {
     get container() { return this._container; }
     get shape() { return this._shape; }
+    get canvas() {
+        assert(this._canvas, 'the editor is not rendered, forgot to call parent\'s render()?');
+        return this._canvas;
+    }
+    get canvasSize() {
+        assert(this._canvasSize, 'the editor is not rendered, forgot to call parent\'s render()?');
+        return this._canvasSize;
+    }
 
     constructor(shape, name) {
         super();
 
-        this._container = new SvgGroup();
         this._shape = shape;
-        this._canvas = null;
+        this._name = name || shape.type;
         this._isActive = false;
-
-        this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${name || shape.type}`);
+        this._container = null;
+        this._canvas = null;
+        this._canvasSize = null;
     }
 
     activate() {
@@ -37,14 +46,17 @@ export default class BaseShapeEditor extends EventEmitter {
         this.container.el.removeChild(element.el);
     }
 
-    appendToCanvas(canvas) {
-        this._canvas = canvas;
-        this._canvas.appendChild(this.container.el);
+    removeFromCanvas() {
+        this.canvas.removeChild(this.container.el);
+        this._canvas = null;
     }
 
-    removeFromCanvas() {
-        this._canvas.removeChild(this.container.el);
-        this._canvas = null;
+    render(canvas) {
+        this._canvas = canvas;
+        this._canvasSize = { width: canvas.clientWidth, height: canvas.clientHeight };
+        this._container = new SvgGroup(this._canvasSize);
+        this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
+        this._canvas.appendChild(this.container.el);
     }
 
     onActivated() {
@@ -58,6 +70,5 @@ export default class BaseShapeEditor extends EventEmitter {
     onCanvasClick(x, y) {}
     onCanvasMouseMove(x, y) {}
     onCanvasKeyPressed(key) {}
-    render() {}
 
 }

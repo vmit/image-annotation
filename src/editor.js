@@ -27,11 +27,11 @@ export default class Editor extends EventEmitter {
         });
 
         this._el.canvas.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            activeShapeEditor.onCanvasClick(e.clientX - this._canvasPosition.left, e.clientY - this._canvasPosition.top);
+            activeShapeEditor.onCanvasClick(this._clientX2Normalized(e.clientX), this._clientY2Normalized(e.clientY));
         }));
 
         this._el.canvas.addEventListener('mousemove', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            activeShapeEditor.onCanvasMouseMove(e.clientX - this._canvasPosition.left, e.clientY - this._canvasPosition.top);
+            activeShapeEditor.onCanvasMouseMove(this._clientX2Normalized(e.clientX), this._clientY2Normalized(e.clientY));
         }));
 
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
@@ -43,14 +43,12 @@ export default class Editor extends EventEmitter {
     }
 
     _appendShapeEditor(shapeEditor) {
-        shapeEditor.render();
-        shapeEditor.appendToCanvas(this._el.canvas);
+        shapeEditor.render(this._el.canvas);
         shapeEditor.on('shape:editor:activate', this._activateShapeEditor.bind(this, shapeEditor));
     }
 
     _appendNewShapeEditor(newShapeEditor) {
-        newShapeEditor.render();
-        newShapeEditor.appendToCanvas(this._el.canvas);
+        newShapeEditor.render(this._el.canvas);
         newShapeEditor.on('shape:new', this._onNewShape.bind(this));
         newShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
         this._activateShapeEditor(newShapeEditor);
@@ -70,6 +68,18 @@ export default class Editor extends EventEmitter {
 
     _withActiveShapeEditor(cb) {
         this._activeShapeEditor && cb(this._activeShapeEditor);
+    }
+
+    _clientX2Normalized(clientX) {
+        return this._roundCoordinate((clientX - this._canvasPosition.left) / this._canvasPosition.width);
+    }
+
+    _clientY2Normalized(clientY) {
+        return this._roundCoordinate((clientY - this._canvasPosition.top) / this._canvasPosition.height);
+    }
+
+    _roundCoordinate(value) {
+        return Math.round(value * 100) / 100;
     }
 
     _onNewShape(shape) {
