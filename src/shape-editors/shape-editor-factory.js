@@ -1,4 +1,5 @@
-import {PolygonEditor, NewPolygonEditor} from './polygon-editor';
+import PolygonEditor from './polygon-editor';
+import NewPolygonEditor from './new-polygon-editor';
 
 export default {
     editors: {
