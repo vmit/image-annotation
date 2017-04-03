@@ -5,6 +5,7 @@
 .image-annotation-editor__canvas-container {
     position: relative;
     display: inline-block;
+    line-height: 0;
 }
 .image-annotation-editor__image {
     max-width: 100%;
