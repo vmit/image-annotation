@@ -53,7 +53,7 @@ export default class BaseShapeEditor extends EventEmitter {
 
     render(canvas) {
         this._canvas = canvas;
-        this._canvasSize = { width: canvas.clientWidth, height: canvas.clientHeight };
+        this._canvasSize = canvas.getBoundingClientRect();
         this._container = new SvgGroup(this._canvasSize);
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
         this._canvas.appendChild(this.container.el);
