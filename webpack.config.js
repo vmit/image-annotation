@@ -19,6 +19,13 @@ module.exports = {
             },
             {
                 test: /\.html$/,
+                loader: 'html-loader',
+                query: {
+                    interpolate: true
+                }
+            },
+            {
+                test: /\.svg$/,
                 loader: 'raw-loader'
             },
             {
@@ -26,6 +33,5 @@ module.exports = {
                 loader: 'style-loader!css-loader'
             }
         ]
-    },
-    devtool: 'source-map'
+    }
 };

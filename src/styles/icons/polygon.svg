@@ -1,0 +1,10 @@
+<svg class="ia-canvas" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <polygon class="ia-element ia-element-polygon" points="3,16 14,22 23,14 12,13 8,3"></polygon>
+        <circle class="ia-element ia-element-point" r="2" cx="3" cy="16"/>
+        <circle class="ia-element ia-element-point" r="2" cx="14" cy="22"/>
+        <circle class="ia-element ia-element-point" r="2" cx="23" cy="14"/>
+        <circle class="ia-element ia-element-point" r="2" cx="12" cy="13"/>
+        <circle class="ia-element ia-element-point" r="2" cx="8" cy="3"/>
+    </g>
+</svg>

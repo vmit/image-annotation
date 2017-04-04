@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import Keys from './utils/keys';
 import shapeEditorFactory from './shape-editors/shape-editor-factory';
 import './styles/editor.css';
+import './styles/canvas.svg.css';
 import './styles/shapes.svg.css';
 
 
@@ -23,16 +24,20 @@ export default class Editor extends EventEmitter {
     render(container) {
         container.innerHTML = editorMarkup;
 
-        this._el = {};
-        this._el.image = container.querySelector('.image-annotation-editor__image');
-        this._el.canvas = container.querySelector('.image-annotation-editor__canvas');
-        this._el.polygon = container.querySelector('.image-annotation-editor__shape-polygon');
+        this._el = {
+            image: container.querySelector('.image-annotation-editor__image'),
+            canvas: container.querySelector('.image-annotation-editor__canvas'),
+            newShapes: {
+                __active__: null,
+                polygon: container.querySelector('.image-annotation-editor__shape-polygon')
+            }
+        };
 
         this._el.image.addEventListener('load', () => {
             this._shapes.forEach((shape) => this._appendShapeEditor(shapeEditorFactory.createEditor(shape)));
         });
 
-        this._el.polygon.addEventListener('click', () => {
+        this._el.newShapes.polygon.addEventListener('click', () => {
             this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
         });
 
@@ -62,6 +67,7 @@ export default class Editor extends EventEmitter {
         newShapeEditor.on('shape:new', this._onNewShape.bind(this));
         newShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
         this._activateShapeEditor(newShapeEditor);
+        this._setNewShapeMode(newShapeEditor.shape.type);
     }
 
     _activateShapeEditor(shapeEditor) {
@@ -92,13 +98,24 @@ export default class Editor extends EventEmitter {
         return Math.round(value * 100) / 100;
     }
 
+    _setNewShapeMode(type) {
+        if (this._el.newShapes.__active__) {
+            this._el.newShapes.__active__.classList.remove('image-annotation-editor__shape_active');
+        }
+        if (this._el.newShapes.__active__ = this._el.newShapes[type]) {
+            this._el.newShapes.__active__.classList.add('image-annotation-editor__shape_active');
+        }
+    }
+
     _onNewShape(shape) {
         this._activateShapeEditor(null);
+        this._setNewShapeMode(null);
         this._shapes.push(shape);
         this._appendShapeEditor(shapeEditorFactory.createEditor(shape));
     }
 
     _onCancelShape(shape) {
         this._activateShapeEditor(null);
+        this._setNewShapeMode(null);
     }
 }
