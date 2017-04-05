@@ -60,6 +60,7 @@ export default class Editor extends EventEmitter {
     _appendShapeEditor(shapeEditor) {
         shapeEditor.render(this._el.canvas);
         shapeEditor.on('shape:editor:activate', this._activateShapeEditor.bind(this, shapeEditor));
+        shapeEditor.on('shape:editor:updated', this.emit.bind(this, 'shapes:updated', this.shapes));
     }
 
     _appendNewShapeEditor(newShapeEditor) {
@@ -112,6 +113,7 @@ export default class Editor extends EventEmitter {
         this._setNewShapeMode(null);
         this._shapes.push(shape);
         this._appendShapeEditor(shapeEditorFactory.createEditor(shape));
+        this.emit('shapes:updated', this.shapes);
     }
 
     _onCancelShape(shape) {

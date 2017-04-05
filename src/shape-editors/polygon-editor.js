@@ -50,6 +50,7 @@ export default class PolygonEditor extends BaseShapeEditor {
     _onPointMouseUp(pointElement) {
         this._el.activePoint = pointElement;
         this._el.draggablePoint = null;
+        this.emit('shape:editor:updated', this.shape);
     }
 
     render(canvas) {
