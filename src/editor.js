@@ -1,6 +1,7 @@
 import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import Keys from './utils/keys';
+import ThrottledProvider from './utils/throttled-provider';
 import shapeEditorFactory from './shape-editors/shape-editor-factory';
 import './styles/editor.css';
 import './styles/canvas.svg.css';
@@ -18,7 +19,7 @@ export default class Editor extends EventEmitter {
         this._imageUrl = imageUrl;
         this._shapes = shapes;
         this._activeShapeEditor = null;
-        this._canvasPosition = null;
+        this._canvasPositionProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
     }
 
     render(container) {
@@ -42,11 +43,13 @@ export default class Editor extends EventEmitter {
         });
 
         this._el.canvas.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            activeShapeEditor.onCanvasClick(this._clientX2Normalized(e.clientX), this._clientY2Normalized(e.clientY));
+            const canvasPosition = this._canvasPositionProvider.get();
+            activeShapeEditor.onCanvasClick(this._clientX2Normalized(e.clientX, canvasPosition), this._clientY2Normalized(e.clientY, canvasPosition));
         }));
 
         this._el.canvas.addEventListener('mousemove', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            activeShapeEditor.onCanvasMouseMove(this._clientX2Normalized(e.clientX), this._clientY2Normalized(e.clientY));
+            const canvasPosition = this._canvasPositionProvider.get();
+            activeShapeEditor.onCanvasMouseMove(this._clientX2Normalized(e.clientX, canvasPosition), this._clientY2Normalized(e.clientY, canvasPosition));
         }));
 
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
@@ -72,8 +75,6 @@ export default class Editor extends EventEmitter {
     }
 
     _activateShapeEditor(shapeEditor) {
-        this._canvasPosition = this._el.canvas.getBoundingClientRect();
-
         this._activeShapeEditor = shapeEditor;
         this.emit('shape:editor:activated', shapeEditor);
 
@@ -87,12 +88,12 @@ export default class Editor extends EventEmitter {
         this._activeShapeEditor && cb(this._activeShapeEditor);
     }
 
-    _clientX2Normalized(clientX) {
-        return this._roundCoordinate((clientX - this._canvasPosition.left) / this._canvasPosition.width);
+    _clientX2Normalized(clientX, canvasPosition) {
+        return this._roundCoordinate((clientX - canvasPosition.left) / canvasPosition.width);
     }
 
-    _clientY2Normalized(clientY) {
-        return this._roundCoordinate((clientY - this._canvasPosition.top) / this._canvasPosition.height);
+    _clientY2Normalized(clientY, canvasPosition) {
+        return this._roundCoordinate((clientY - canvasPosition.top) / canvasPosition.height);
     }
 
     _roundCoordinate(value) {
