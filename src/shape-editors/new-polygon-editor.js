@@ -1,11 +1,11 @@
-import BaseShapeEditor from './base-shape-editor';
+import BaseNewShapeEditor from './base-new-shape-editor';
 import SvgPoint from '../utils/svg/svg-point';
 import SvgLine from '../utils/svg/svg-line';
 import SvgPolyline from '../utils/svg/svg-polyline';
 import Keys from '../utils/keys';
 
 
-export default class NewPolygonEditor extends BaseShapeEditor {
+export default class NewPolygonEditor extends BaseNewShapeEditor {
 
     constructor() {
         super({ type: 'polygon', data: [] }, 'new-polygon');
