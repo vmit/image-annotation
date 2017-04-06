@@ -32,6 +32,8 @@ export default class Editor extends EventEmitter {
             canvas: container.querySelector('.image-annotation-editor__canvas'),
             zoomIn: container.querySelector('.image-annotation-editor__zoom-in'),
             zoomOut: container.querySelector('.image-annotation-editor__zoom-out'),
+            remove: container.querySelector('.image-annotation-editor__remove'),
+            shapeEditorTools: container.querySelector('.image-annotation-editor__tools-group-shape-editor'),
             newShapes: {
                 __active__: null,
                 polygon: container.querySelector('.image-annotation-editor__shape-polygon')
@@ -41,6 +43,9 @@ export default class Editor extends EventEmitter {
         this._el.image.addEventListener('load', () => this._renderShapes());
         this._el.zoomIn.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue * 1.15)));
         this._el.zoomOut.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue / 1.15)));
+        this._el.remove.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
+            activeShapeEditor.onRemove();
+        }));
 
         this._el.newShapes.polygon.addEventListener('click', () => {
             this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
@@ -91,6 +96,9 @@ export default class Editor extends EventEmitter {
         if (shapeEditor != null) {
             shapeEditor.onActivated();
             this.once('shape:editor:activated', () => shapeEditor.onDeactivated());
+            this._el.shapeEditorTools.classList.add('image-annotation-editor__tools-group-shape-editor_active');
+        } else {
+            this._el.shapeEditorTools.classList.remove('image-annotation-editor__tools-group-shape-editor_active');
         }
     }
 

@@ -27,6 +27,10 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         }
     }
 
+    onRemove() {
+        this.emit('shape:cancel', this.shape);
+    }
+
     onDeactivated() {
         super.onDeactivated();
 
