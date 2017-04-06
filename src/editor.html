@@ -1,11 +1,17 @@
 <div class="image-annotation-editor">
     <div class="image-annotation-editor__tools">
-        <div class="image-annotation-editor__shape image-annotation-editor__shape-polygon">
-            ${require('./styles/icons/polygon.svg')}
+        <div class="image-annotation-editor__font-icon image-annotation-editor__zoom-in">+</div>
+        <div class="image-annotation-editor__font-icon image-annotation-editor__zoom-out">-</div>
+        <div class="image-annotation-editor__shapes">
+            <div class="image-annotation-editor__shape image-annotation-editor__shape-polygon">
+                ${require('./styles/icons/polygon.svg')}
+            </div>
         </div>
     </div>
-    <div class="image-annotation-editor__canvas-container">
-        <img class="image-annotation-editor__image" src="">
-        <svg class="image-annotation-editor__canvas ia-canvas" version="1.1" tabindex="0"></svg>
+    <div class="image-annotation-editor__canvas-zoomer">
+        <div class="image-annotation-editor__canvas-container">
+            <img class="image-annotation-editor__image">
+            <svg class="image-annotation-editor__canvas ia-canvas" version="1.1" tabindex="0"></svg>
+        </div>
     </div>
 </div>
