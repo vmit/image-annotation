@@ -1,14 +1,58 @@
+import {normalizeX, normalizeY} from '../utils/position';
 import BaseShapeEditor from './base-shape-editor';
 import SvgPoint from '../utils/svg/svg-point';
+import SvgLine from '../utils/svg/svg-line';
+import SvgGroup from '../utils/svg/svg-g';
 import SvgPolygon from '../utils/svg/svg-polygon';
 
+
+class PolygonOnSteroids extends SvgGroup {
+    set points(points) {
+        this._prepareLines(points);
+        this._polygonElement.points = points;
+    }
+
+    constructor(points, canvasSize, onLineDblClicked) {
+        super(canvasSize);
+
+        this._polygonElement = new SvgPolygon(points, canvasSize);
+        this._lineElements = [];
+        this._onLineDblClicked = onLineDblClicked;
+
+        this.append(this._polygonElement);
+
+        this._prepareLines(points);
+    }
+
+    _prepareLines(points) {
+        const length = points.length;
+        let i = 0;
+        for (; i < points.length; i++) {
+            const start = points[i];
+            const end = points[(i + 1) % length];
+
+            if (this._lineElements[i]) {
+                this._lineElements[i].start = start;
+                this._lineElements[i].end = end
+            } else {
+                this._lineElements[i] = new SvgLine(start, end, this.canvasSize, 'polygon-overlay-line');
+                this._lineElements[i].el.addEventListener('dblclick', this._onLineDblClicked.bind(this, i));
+                this.append(this._lineElements[i]);
+            }
+        }
+
+        for (; i < this._lineElements.length; i++) {
+            this.remove(this._lineElements[i]);
+        }
+
+        this._lineElements.length = length;
+    }
+}
 
 export default class PolygonEditor extends BaseShapeEditor {
 
     constructor(shape) {
         super(shape);
-
-        this._pointElements = [];
     }
 
     onCanvasMouseMove(x, y) {
@@ -33,8 +77,8 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _removePoint(point) {
-        const index = this._pointElements.indexOf(point);
-        this._pointElements.splice(index, 1);
+        const index = this._el.pointElements.indexOf(point);
+        this._el.pointElements.splice(index, 1);
         this.shape.data.splice(index, 1);
         this._el.polygon.points = this.shape.data;
         this.remove(point);
@@ -43,19 +87,21 @@ export default class PolygonEditor extends BaseShapeEditor {
             this.emit('shape:editor:remove', this);
             this.removeFromCanvas();
         } else {
-            this._activatePoint(this._pointElements[index] || this._pointElements[index-1]);
+            this._activatePoint(this._el.pointElements[index] || this._el.pointElements[index-1]);
         }
 
         this.emit('shape:editor:updated', this.shape);
     }
 
-    _addPoint(point) {
+    _addPoint(point, position = this._el.pointElements.length) {
         const pointElement = new SvgPoint(point, this.canvasSize);
         this.append(pointElement);
-        this._pointElements.push(pointElement);
+        this._el.pointElements.splice(position, 0, pointElement);
 
         pointElement.el.addEventListener('mousedown', this._onPointMouseDown.bind(this, pointElement));
         pointElement.el.addEventListener('mouseup', this._onPointMouseUp.bind(this, pointElement));
+
+        return pointElement;
     }
 
     _activatePoint(pointElement) {
@@ -80,13 +126,25 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.emit('shape:editor:updated', this.shape);
     }
 
+    _onLineDblClicked(index, event) {
+        const position = index + 1;
+        const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
+        const pointElement = this._addPoint(point, position);
+        this.shape.data.splice(position, 0, point);
+        this._el.polygon.points = this.shape.data;
+        this._activatePoint(pointElement);
+
+        this.emit('shape:editor:updated', this.shape);
+    }
+
     render(canvas) {
         super.render(canvas);
 
         this._el = {
             activePoint: null,
             draggablePoint: null,
-            polygon: new SvgPolygon(this.shape.data, this.canvasSize)
+            pointElements: [],
+            polygon: new PolygonOnSteroids(this.shape.data, this.canvasSize, this._onLineDblClicked.bind(this))
         };
 
         this.append(this._el.polygon);

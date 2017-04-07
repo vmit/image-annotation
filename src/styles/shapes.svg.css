@@ -3,6 +3,11 @@
     stroke-opacity: 0;
 }
 
+.image-annotation-editor__canvas .ia-shape .ia-element-polygon-overlay-line {
+    stroke-opacity: 0;
+    stroke-width: 8px;
+}
+
 .image-annotation-editor__canvas .ia-shape .ia-element-point:hover {
     stroke-width: 4px;
 }

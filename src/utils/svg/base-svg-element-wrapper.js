@@ -1,6 +1,7 @@
 
 export default class BaseSvgElementWrapper {
     get el() { return this._el; }
+    get canvasSize() { return this._canvasSize; }
 
     /**
      * @param {string} type

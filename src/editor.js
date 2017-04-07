@@ -1,6 +1,7 @@
 import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import Keys from './utils/keys';
+import {normalizeX, normalizeY} from './utils/position';
 import ThrottledProvider from './utils/throttled-provider';
 import shapeEditorFactory from './shape-editors/shape-editor-factory';
 import './styles/editor.css';
@@ -53,12 +54,12 @@ export default class Editor extends EventEmitter {
 
         this._el.canvas.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
             const canvasPosition = this._canvasPositionProvider.get();
-            activeShapeEditor.onCanvasClick(this._clientX2Normalized(e.clientX, canvasPosition), this._clientY2Normalized(e.clientY, canvasPosition));
+            activeShapeEditor.onCanvasClick(normalizeX(e.clientX, canvasPosition), normalizeY(e.clientY, canvasPosition));
         }));
 
         this._el.canvas.addEventListener('mousemove', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
             const canvasPosition = this._canvasPositionProvider.get();
-            activeShapeEditor.onCanvasMouseMove(this._clientX2Normalized(e.clientX, canvasPosition), this._clientY2Normalized(e.clientY, canvasPosition));
+            activeShapeEditor.onCanvasMouseMove(normalizeX(e.clientX, canvasPosition), normalizeY(e.clientY, canvasPosition));
         }));
 
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
@@ -107,18 +108,6 @@ export default class Editor extends EventEmitter {
         this._activeShapeEditor && cb(this._activeShapeEditor);
     }
 
-    _clientX2Normalized(clientX, canvasPosition) {
-        return this._roundCoordinate((clientX - canvasPosition.left) / canvasPosition.width);
-    }
-
-    _clientY2Normalized(clientY, canvasPosition) {
-        return this._roundCoordinate((clientY - canvasPosition.top) / canvasPosition.height);
-    }
-
-    _roundCoordinate(value) {
-        return Math.round(value * 100) / 100;
-    }
-
     _setNewShapeMode(type) {
         if (this._el.newShapes.__active__) {
             this._el.newShapes.__active__.classList.remove('image-annotation-editor__shape_active');
@@ -133,6 +122,7 @@ export default class Editor extends EventEmitter {
         if (value >= 10 && value <= 1000) {
             this._zoomValue = value;
             this._el.container.style.width = `${value}%`;
+            this._activateShapeEditor(null);
             this._renderShapes();
         }
     }

@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import SvgGroup from '../utils/svg/svg-g';
+import ThrottledProvider from '../utils/throttled-provider';
 import assert from '../utils/assert';
 
 
@@ -11,8 +12,7 @@ export default class BaseShapeEditor extends EventEmitter {
         return this._canvas;
     }
     get canvasSize() {
-        assert(this._canvasSize, 'the editor is not rendered, forgot to call parent\'s render()?');
-        return this._canvasSize;
+        return this._canvasPositionProvider.get();
     }
 
     constructor(shape, name) {
@@ -21,6 +21,7 @@ export default class BaseShapeEditor extends EventEmitter {
         this._shape = shape;
         this._name = name || shape.type;
         this._isActive = false;
+        this._canvasPositionProvider = new ThrottledProvider(() => this.canvas.getBoundingClientRect());
         this._container = null;
         this._canvas = null;
         this._canvasSize = null;
@@ -53,7 +54,6 @@ export default class BaseShapeEditor extends EventEmitter {
 
     render(canvas) {
         this._canvas = canvas;
-        this._canvasSize = canvas.getBoundingClientRect();
         this._container = new SvgGroup(this._canvasSize);
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
         this._canvas.appendChild(this.container.el);
