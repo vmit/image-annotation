@@ -2,6 +2,7 @@
     position: relative;
     min-height: 100px;
     padding-left: 30px;
+    user-select: none;
 }
 .image-annotation-editor__tools-group:before {
     content: '';
