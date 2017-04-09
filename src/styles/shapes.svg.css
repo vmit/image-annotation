@@ -8,6 +8,11 @@
     stroke-width: 8px;
 }
 
+.image-annotation-editor__canvas .ia-shape .ia-element-point-underlay {
+    stroke-opacity: 0;
+    fill-opacity: 0;
+}
+
 .image-annotation-editor__canvas .ia-shape .ia-element-point:hover {
     stroke-width: 4px;
 }

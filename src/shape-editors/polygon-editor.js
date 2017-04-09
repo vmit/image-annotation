@@ -1,6 +1,6 @@
 import {normalizeX, normalizeY} from '../utils/position';
 import BaseShapeEditor from './base-shape-editor';
-import SvgPoint from '../utils/svg/svg-point';
+import SvgPointDraggable from '../utils/svg/svg-point-draggable';
 import SvgLine from '../utils/svg/svg-line';
 import SvgGroup from '../utils/svg/svg-g';
 import SvgPolygon from '../utils/svg/svg-polygon';
@@ -51,17 +51,6 @@ class PolygonOnSteroids extends SvgGroup {
 
 export default class PolygonEditor extends BaseShapeEditor {
 
-    constructor(shape) {
-        super(shape);
-    }
-
-    onCanvasMouseMove(x, y) {
-        if (this._el.draggablePoint) {
-            this._el.draggablePoint.point = { x, y }
-            this._el.polygon.points = this.shape.data;
-        }
-    }
-
     onRemove() {
         if (this._el.activePoint) {
             this._removePoint(this._el.activePoint);
@@ -94,12 +83,13 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _addPoint(point, position = this._el.pointElements.length) {
-        const pointElement = new SvgPoint(point, this.canvasSize);
+        const pointElement = new SvgPointDraggable(point, this.canvasSize, this._onPointDragged.bind(this), this._onPointDropped.bind(this));
         this.append(pointElement);
         this._el.pointElements.splice(position, 0, pointElement);
-
-        pointElement.el.addEventListener('mousedown', this._onPointMouseDown.bind(this, pointElement));
-        pointElement.el.addEventListener('mouseup', this._onPointMouseUp.bind(this, pointElement));
+        pointElement.el.addEventListener('click', () => {
+            this._activatePoint(this._el.draggablePoint = pointElement);
+            this.activate();
+        });
 
         return pointElement;
     }
@@ -109,20 +99,17 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.emit('point:activate', pointElement);
 
         if (pointElement != null) {
-            pointElement.addClass('ia-active-point');
+            pointElement.activate();
             // only one active point is allowed
-            this.once('point:activate', () => pointElement.removeClass('ia-active-point'));
+            this.once('point:activate', () => pointElement.deactivate());
         }
     }
 
-    _onPointMouseDown(pointElement) {
-        this._activatePoint(this._el.draggablePoint = pointElement);
-        this.activate();
+    _onPointDragged() {
+        this._el.polygon.points = this.shape.data;
     }
 
-    _onPointMouseUp(pointElement) {
-        this._activatePoint(pointElement);
-        this._el.draggablePoint = null;
+    _onPointDropped() {
         this.emit('shape:editor:updated', this.shape);
     }
 

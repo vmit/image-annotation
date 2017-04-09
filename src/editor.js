@@ -57,11 +57,6 @@ export default class Editor extends EventEmitter {
             activeShapeEditor.onCanvasClick(normalizeX(e.clientX, canvasPosition), normalizeY(e.clientY, canvasPosition));
         }));
 
-        this._el.canvas.addEventListener('mousemove', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            const canvasPosition = this._canvasPositionProvider.get();
-            activeShapeEditor.onCanvasMouseMove(normalizeX(e.clientX, canvasPosition), normalizeY(e.clientY, canvasPosition));
-        }));
-
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
             let key = Keys.fromKeyCode(e.keyCode);
             key && activeShapeEditor.onCanvasKeyPressed(key);

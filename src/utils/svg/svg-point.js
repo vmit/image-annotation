@@ -7,16 +7,29 @@ export default class SvgPoint extends BaseSvgElementWrapper {
         this.set('cx', this.toPxX(this._point.x = value.x));
         this.set('cy', this.toPxY(this._point.y = value.y));
     }
+    set radius(value) {
+        this.set('r', value);
+    }
 
     /**
      * @param point
      * @param clientSize
+     * @param {string} [name='point']
+     * @param {number} [radius=3]
      */
-    constructor(point, clientSize) {
-        super('circle', clientSize, 'point');
+    constructor(point, clientSize, name='point', radius=3) {
+        super('circle', clientSize, name);
 
-        this.set('r', 3);
         this.point = this._point = point;
+        this.radius = radius;
+    }
+
+    activate() {
+        this.addClass('ia-active-point');
+    }
+
+    deactivate() {
+        this.removeClass('ia-active-point');
     }
 
 }
