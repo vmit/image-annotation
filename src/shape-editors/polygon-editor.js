@@ -1,53 +1,7 @@
-import {normalizeX, normalizeY} from '../utils/position';
 import BaseShapeEditor from './base-shape-editor';
 import SvgPointDraggable from '../utils/svg/svg-point-draggable';
-import SvgLine from '../utils/svg/svg-line';
-import SvgGroup from '../utils/svg/svg-g';
-import SvgPolygon from '../utils/svg/svg-polygon';
+import SvgPolygonEditable from '../utils/svg/svg-polygon-editable';
 
-
-class PolygonOnSteroids extends SvgGroup {
-    set points(points) {
-        this._prepareLines(points);
-        this._polygonElement.points = points;
-    }
-
-    constructor(points, canvasSize, onLineDblClicked) {
-        super(canvasSize);
-
-        this._polygonElement = new SvgPolygon(points, canvasSize);
-        this._lineElements = [];
-        this._onLineDblClicked = onLineDblClicked;
-
-        this.append(this._polygonElement);
-
-        this._prepareLines(points);
-    }
-
-    _prepareLines(points) {
-        const length = points.length;
-        let i = 0;
-        for (; i < points.length; i++) {
-            const start = points[i];
-            const end = points[(i + 1) % length];
-
-            if (this._lineElements[i]) {
-                this._lineElements[i].start = start;
-                this._lineElements[i].end = end
-            } else {
-                this._lineElements[i] = new SvgLine(start, end, this.canvasSize, 'polygon-overlay-line');
-                this._lineElements[i].el.addEventListener('dblclick', this._onLineDblClicked.bind(this, i));
-                this.append(this._lineElements[i]);
-            }
-        }
-
-        for (; i < this._lineElements.length; i++) {
-            this.remove(this._lineElements[i]);
-        }
-
-        this._lineElements.length = length;
-    }
-}
 
 export default class PolygonEditor extends BaseShapeEditor {
 
@@ -67,6 +21,7 @@ export default class PolygonEditor extends BaseShapeEditor {
 
     _removePoint(point) {
         const index = this._el.pointElements.indexOf(point);
+
         this._el.pointElements.splice(index, 1);
         this.shape.data.splice(index, 1);
         this._el.polygon.points = this.shape.data;
@@ -113,13 +68,8 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.emit('shape:editor:updated', this.shape);
     }
 
-    _onLineDblClicked(index, event) {
-        const position = index + 1;
-        const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-        const pointElement = this._addPoint(point, position);
-        this.shape.data.splice(position, 0, point);
-        this._el.polygon.points = this.shape.data;
-        this._activatePoint(pointElement);
+    _onAddPoint(point, position) {
+        this._activatePoint(this._addPoint(point, position));
 
         this.emit('shape:editor:updated', this.shape);
     }
@@ -131,7 +81,7 @@ export default class PolygonEditor extends BaseShapeEditor {
             activePoint: null,
             draggablePoint: null,
             pointElements: [],
-            polygon: new PolygonOnSteroids(this.shape.data, this.canvasSize, this._onLineDblClicked.bind(this))
+            polygon: new SvgPolygonEditable(this.shape.data, this.canvasSize, this._onAddPoint.bind(this))
         };
 
         this.append(this._el.polygon);
