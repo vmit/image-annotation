@@ -15,7 +15,6 @@ export default class PolygonEditor extends BaseShapeEditor {
         super.onDeactivated();
 
         this._el.activePoint = null;
-        this._el.draggablePoint = null;
         this._activatePoint(null);
     }
 
@@ -42,7 +41,7 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.append(pointElement);
         this._el.pointElements.splice(position, 0, pointElement);
         pointElement.el.addEventListener('click', () => {
-            this._activatePoint(this._el.draggablePoint = pointElement);
+            this._activatePoint(pointElement);
             this.activate();
         });
 
@@ -79,7 +78,6 @@ export default class PolygonEditor extends BaseShapeEditor {
 
         this._el = {
             activePoint: null,
-            draggablePoint: null,
             pointElements: [],
             polygon: new SvgPolygonEditable(this.shape.data, this.canvasSize, this._onAddPoint.bind(this))
         };
