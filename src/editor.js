@@ -52,11 +52,6 @@ export default class Editor extends EventEmitter {
             this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
         });
 
-        this._el.canvas.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            const canvasPosition = this._canvasPositionProvider.get();
-            activeShapeEditor.onCanvasClick(normalizeX(e.clientX, canvasPosition), normalizeY(e.clientY, canvasPosition));
-        }));
-
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
             let key = Keys.fromKeyCode(e.keyCode);
             key && activeShapeEditor.onCanvasKeyPressed(key);

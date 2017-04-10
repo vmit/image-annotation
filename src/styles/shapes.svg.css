@@ -13,6 +13,14 @@
     fill-opacity: 0;
 }
 
+.image-annotation-editor__canvas .ia-shape .ia-element-active-line {
+    pointer-events: none;
+}
+
+.image-annotation-editor__canvas .ia-shape .ia-element-new-polygon-polyline {
+    pointer-events: none;
+}
+
 .image-annotation-editor__canvas .ia-shape .ia-element-point:hover {
     stroke-width: 4px;
 }

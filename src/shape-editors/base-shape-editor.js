@@ -67,7 +67,6 @@ export default class BaseShapeEditor extends EventEmitter {
         this._isActive = false;
     }
 
-    onCanvasClick(x, y) {}
     onCanvasKeyPressed(key) {}
     onRemove() {}
 

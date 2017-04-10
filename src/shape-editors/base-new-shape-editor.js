@@ -12,10 +12,12 @@ class SvgOverlay extends BaseSvgElementWrapper {
 }
 
 export default class BaseNewShapeEditor extends BaseShapeEditor {
+    get overlay() { return this._overlay; }
 
     render(canvas) {
         super.render(canvas);
-        this.append(new SvgOverlay(this.canvasSize));
+
+        this.append(this._overlay = new SvgOverlay(this.canvasSize));
     }
 
 }

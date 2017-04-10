@@ -11,9 +11,10 @@ export default class SvgPolyline extends BaseSvgElementWrapper {
     /**
      * @param points
      * @param clientSize
+     * @param name
      */
-    constructor(points, clientSize) {
-        super('polyline', clientSize);
+    constructor(points, clientSize, name) {
+        super('polyline', clientSize, name);
 
         this.points = points;
     }
