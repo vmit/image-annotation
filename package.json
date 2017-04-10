@@ -1,8 +1,9 @@
 {
   "name": "image-annotation",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "author": "Dmitry Vykochko",
+  "main": "build/image-annotation-editor.bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/webpack/bin/webpack.js",
