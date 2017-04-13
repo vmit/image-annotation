@@ -11,6 +11,7 @@ export default class BaseShapeEditor extends EventEmitter {
     get canvasSizeProvider() { return this._canvasPositionProvider; }
     get canvasSize() { return this.canvasSizeProvider.get(); }
     get id() { return this._id || (this._id = `shape-editor_` + Math.random()); }
+    get controls() { return []; }
 
     constructor(shape, name) {
         super();
@@ -69,6 +70,5 @@ export default class BaseShapeEditor extends EventEmitter {
     }
 
     onCanvasKeyPressed(key) {}
-    onRemove() {}
 
 }

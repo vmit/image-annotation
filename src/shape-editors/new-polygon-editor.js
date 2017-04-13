@@ -7,6 +7,16 @@ import Keys from '../utils/keys';
 
 
 export default class NewPolygonEditor extends BaseNewShapeEditor {
+    get controls() { return [{
+        name: 'back',
+        title: '&#8617;',
+        hidden: this.shape.data.length === 0,
+        action: this._removeLastPoint.bind(this)
+    }, {
+        name: 'remove',
+        title: '&#215;',
+        action: this._onRemove.bind(this)
+    }]};
 
     constructor() {
         super({ type: 'polygon', data: [] }, 'new-polygon');
@@ -18,10 +28,6 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         } else if (key === Keys.ENTER) {
             this._closePolygon();
         }
-    }
-
-    onRemove() {
-        this.emit('shape:cancel', this);
     }
 
     onDeactivated() {
@@ -43,6 +49,8 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
         this.append(pointElement);
         this._el.polyline.points = this.shape.data;
+
+        this.emit('controls:change', this.controls);
     }
 
     _removeLastPoint() {
@@ -109,6 +117,10 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
     _onMouseMove(event) {
         const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
         this._updateActiveLine(point);
+    }
+
+    _onRemove() {
+        this.emit('shape:cancel', this);
     }
 
     render(canvas) {

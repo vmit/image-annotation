@@ -31,8 +31,8 @@ export default class Editor extends EventEmitter {
             canvas: container.querySelector('.image-annotation-editor__canvas'),
             zoomIn: container.querySelector('.image-annotation-editor__zoom-in'),
             zoomOut: container.querySelector('.image-annotation-editor__zoom-out'),
-            remove: container.querySelector('.image-annotation-editor__remove'),
-            shapeEditorTools: container.querySelector('.image-annotation-editor__tools-group-shape-editor'),
+            tools: container.querySelector('.image-annotation-editor__tools'),
+            shapeControls: null,
             newShapes: {
                 __active__: null,
                 polygon: container.querySelector('.image-annotation-editor__shape-polygon')
@@ -42,9 +42,6 @@ export default class Editor extends EventEmitter {
         this._el.image.addEventListener('load', () => this._renderShapes());
         this._el.zoomIn.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue * 1.15)));
         this._el.zoomOut.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue / 1.15)));
-        this._el.remove.addEventListener('click', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
-            activeShapeEditor.onRemove();
-        }));
 
         this._el.newShapes.polygon.addEventListener('click', () => {
             this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
@@ -87,12 +84,16 @@ export default class Editor extends EventEmitter {
         this._activeShapeEditor = shapeEditor;
         this.emit('shape:editor:activated', shapeEditor);
 
+        if (this._el.shapeControls) {
+            this._el.shapeControls.remove();
+            this._el.shapeControls = null;
+        }
+
         if (shapeEditor != null) {
+            this._el.shapeControls = new Editor.ShapeControls(shapeEditor, this._el.tools);
+
             shapeEditor.onActivated();
             this.once('shape:editor:activated', () => shapeEditor.onDeactivated());
-            this._el.shapeEditorTools.classList.add('image-annotation-editor__tools-group-shape-editor_active');
-        } else {
-            this._el.shapeEditorTools.classList.remove('image-annotation-editor__tools-group-shape-editor_active');
         }
     }
 
@@ -142,5 +143,58 @@ export default class Editor extends EventEmitter {
 
         this._activateShapeEditor(null);
         this._shapes.splice(this._shapes.indexOf(shapeEditor.shape), 1);
+    }
+}
+
+Editor.ShapeControls = class {
+    constructor(shapeEditor, container) {
+        this._shapeEditor = shapeEditor;
+        this._container = container;
+        this._el = document.createElement('div');
+        this._el.setAttribute('class', 'image-annotation-editor__tools-group image-annotation-editor__shape-controls');
+
+        shapeEditor.on('controls:change', this._onControlsChange = (controls) => this._renderControls(controls));
+
+        this._renderControls(shapeEditor.controls);
+    }
+
+    remove() {
+        this._removeFromContainer();
+        this._shapeEditor.removeListener('controls:change', this._onControlsChange);
+    }
+
+    _addToContainer() {
+        if (!this._container.contains(this._el)) {
+            this._container.appendChild(this._el);
+        }
+    }
+
+    _removeFromContainer() {
+        if (this._container.contains(this._el)) {
+            this._container.removeChild(this._el);
+        }
+    }
+
+    _renderControls(controls) {
+        while(this._el.hasChildNodes()) {
+            this._el.removeChild(this._el.lastChild);
+        }
+
+        controls = controls.filter((control) => !control.hidden);
+
+        controls.forEach((control) => {
+            const controlElement = document.createElement('div');
+            controlElement.setAttribute('class', `image-annotation-editor__font-icon`);
+            controlElement.innerHTML = `${control.title}`;
+            controlElement.addEventListener('click', control.action);
+
+            this._el.appendChild(controlElement);
+        });
+
+        if (controls.length > 0) {
+            this._addToContainer();
+        } else {
+            this._removeFromContainer();
+        }
     }
 }

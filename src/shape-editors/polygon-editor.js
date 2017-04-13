@@ -4,12 +4,11 @@ import SvgPolygonEditable from '../utils/svg/svg-polygon-editable';
 
 
 export default class PolygonEditor extends BaseShapeEditor {
-
-    onRemove() {
-        if (this._el.activePoint) {
-            this._removePoint(this._el.activePoint);
-        }
-    }
+    get controls() { return [{
+        name: 'remove',
+        title: '&#215;',
+        action: this._onActivePointRemove.bind(this)
+    }]};
 
     onDeactivated() {
         super.onDeactivated();
@@ -71,6 +70,12 @@ export default class PolygonEditor extends BaseShapeEditor {
         this._activatePoint(this._addPoint(point, position));
 
         this.emit('shape:editor:updated', this.shape);
+    }
+
+    _onActivePointRemove() {
+        if (this._el.activePoint) {
+            this._removePoint(this._el.activePoint);
+        }
     }
 
     render(canvas) {
