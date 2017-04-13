@@ -86,8 +86,24 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
     _onClickOverlay(event) {
         const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-        console.log(point)
         this._addPoint(point);
+    }
+
+    /**
+     * Tells the user (by visual effect) that the polygon is not closed.
+     *
+     * @param event
+     * @private
+     */
+    _onOverlayMouseOut(event) {
+        // mouseout is fired when its own circle is hovered, that is why we check
+        if (!this.container.el.contains(event.relatedTarget)) {
+            this.container.el.classList.add('ia-shape-new-polygon__not-finished');
+        }
+    }
+
+    _onOverlayMouseEnter(event) {
+        this.container.el.classList.remove('ia-shape-new-polygon__not-finished');
     }
 
     _onMouseMove(event) {
@@ -109,5 +125,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
         this.overlay.el.addEventListener('click', this._onClickOverlay.bind(this));
         this.overlay.el.addEventListener('mousemove', this._onMouseMove.bind(this));
+        this.overlay.el.addEventListener('mouseout', this._onOverlayMouseOut.bind(this));
+        this.overlay.el.addEventListener('mouseenter', this._onOverlayMouseEnter.bind(this));
     }
 }

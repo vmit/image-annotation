@@ -37,6 +37,26 @@
     stroke-width: 0px;
 }
 
+.image-annotation-editor__canvas .ia-shape-new-polygon__not-finished .ia-element {
+    opacity: 0.7;
+    fill: #ccc;
+    stroke: #ccc;
+}
+
+@keyframes point-pulse {
+      0% { stroke-width: 1px; }
+     25% { stroke-width: 8px; }
+     50% { stroke-width: 5px; }
+     75% { stroke-width: 8px; }
+    100% { stroke-width: 1px; }
+}
+
+.image-annotation-editor__canvas .ia-shape-new-polygon__not-finished .ia-element.ia-first-point {
+    animation-name: point-pulse;
+    animation-duration: 1.5s;
+    opacity: 1;
+}
+
 .image-annotation-editor__canvas .ia-shape-new-polygon .ia-first-point:hover {
     stroke-width: 4px;
 }
