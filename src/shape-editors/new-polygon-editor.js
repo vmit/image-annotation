@@ -21,7 +21,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
     }
 
     onRemove() {
-        this.emit('shape:cancel', this.shape);
+        this.emit('shape:cancel', this);
     }
 
     onDeactivated() {
@@ -31,7 +31,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
     }
 
     _addPoint(point) {
-        const pointElement = new SvgPoint(point, this.canvasSize);
+        const pointElement = new SvgPoint(point, this.canvasSizeProvider);
 
         if (this.shape.data.length == 0) {
             pointElement.addClass('ia-first-point');
@@ -76,7 +76,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
     _closePolygon() {
         if (this.shape.data.length > 2) {
-            this.emit('shape:new', this.shape);
+            this.emit('shape:new', this);
 
             return true;
         }
@@ -115,8 +115,8 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         super.render(canvas);
 
         this._el = {
-            polyline: new SvgPolyline([], this.canvasSize, 'new-polygon-polyline'),
-            activeLine: new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }, this.canvasSize, 'active-line'),
+            polyline: new SvgPolyline([], this.canvasSizeProvider, 'new-polygon-polyline'),
+            activeLine: new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }, this.canvasSizeProvider, 'active-line'),
             points: []
         }
 
@@ -127,5 +127,13 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         this.overlay.el.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.overlay.el.addEventListener('mouseout', this._onOverlayMouseOut.bind(this));
         this.overlay.el.addEventListener('mouseenter', this._onOverlayMouseEnter.bind(this));
+    }
+
+    rerender() {
+        super.rerender();
+
+        this._el.polyline.render();
+        this._el.activeLine.render();
+        this._el.points.forEach((point) => point.render());
     }
 }

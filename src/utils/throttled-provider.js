@@ -19,11 +19,15 @@ export default class ThrottledProvider {
     get() {
         const now = Date.now();
 
-        if (now - this._latestCallTime > this._wait) {
+        if (now - this._latestCallTime > this._wait || this._latestValue == null) {
             this._latestCallTime = now;
             this._latestValue = this._providerFn();
         }
 
         return this._latestValue
+    }
+
+    clear() {
+        this._latestValue = null;
     }
 }

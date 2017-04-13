@@ -1,7 +1,6 @@
 import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import Keys from './utils/keys';
-import {normalizeX, normalizeY} from './utils/position';
 import ThrottledProvider from './utils/throttled-provider';
 import shapeEditorFactory from './shape-editors/shape-editor-factory';
 import './styles/editor.css';
@@ -10,15 +9,14 @@ import './styles/shapes.svg.css';
 
 
 export default class Editor extends EventEmitter {
-    get shapes() {
-        return this._shapes;
-    }
+    get shapes() { return this._shapes; }
 
     constructor(imageUrl, shapes = []) {
         super();
 
         this._imageUrl = imageUrl;
         this._shapes = shapes;
+        this._shapeEditors = {}; // id => shape editor
         this._activeShapeEditor = null;
         this._zoomValue = null;
         this._canvasPositionProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
@@ -67,6 +65,8 @@ export default class Editor extends EventEmitter {
     }
 
     _appendShapeEditor(shapeEditor) {
+        this._shapeEditors[shapeEditor.id] = shapeEditor;
+
         shapeEditor.render(this._el.canvas);
         shapeEditor.on('shape:editor:activate', this._activateShapeEditor.bind(this, shapeEditor));
         shapeEditor.on('shape:editor:remove', this._onRemoveShape.bind(this, shapeEditor));
@@ -74,6 +74,8 @@ export default class Editor extends EventEmitter {
     }
 
     _appendNewShapeEditor(newShapeEditor) {
+        this._shapeEditors[newShapeEditor.id] = newShapeEditor;
+
         newShapeEditor.render(this._el.canvas);
         newShapeEditor.on('shape:new', this._onNewShape.bind(this));
         newShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
@@ -112,25 +114,33 @@ export default class Editor extends EventEmitter {
         if (value >= 10 && value <= 1000) {
             this._zoomValue = value;
             this._el.container.style.width = `${value}%`;
-            this._activateShapeEditor(null);
-            this._renderShapes();
+            for (const id in this._shapeEditors) {
+                this._shapeEditors[id].rerender();
+            }
         }
     }
 
-    _onNewShape(shape) {
+    _onNewShape(shapeEditor) {
+        delete this._shapeEditors[shapeEditor.id];
+
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
-        this._shapes.push(shape);
-        this._appendShapeEditor(shapeEditorFactory.createEditor(shape));
+        this._shapes.push(shapeEditor.shape);
+        this._appendShapeEditor(shapeEditorFactory.createEditor(shapeEditor.shape));
         this.emit('shapes:updated', this.shapes);
     }
 
-    _onCancelShape(shape) {
+    _onCancelShape(shapeEditor) {
+        delete this._shapeEditors[shapeEditor.id];
+
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
     }
 
-    _onRemoveShape(shape) {
+    _onRemoveShape(shapeEditor) {
+        delete this._shapeEditors[shapeEditor.id];
+
         this._activateShapeEditor(null);
+        this._shapes.splice(this._shapes.indexOf(shapeEditor.shape), 1);
     }
 }

@@ -7,13 +7,10 @@ import assert from '../utils/assert';
 export default class BaseShapeEditor extends EventEmitter {
     get container() { return this._container; }
     get shape() { return this._shape; }
-    get canvas() {
-        assert(this._canvas, 'the editor is not rendered, forgot to call parent\'s render()?');
-        return this._canvas;
-    }
-    get canvasSize() {
-        return this._canvasPositionProvider.get();
-    }
+    get canvas() { assert(this._canvas, 'the editor is not rendered, forgot to call parent\'s render()?'); return this._canvas; }
+    get canvasSizeProvider() { return this._canvasPositionProvider; }
+    get canvasSize() { return this.canvasSizeProvider.get(); }
+    get id() { return this._id || (this._id = `shape-editor_` + Math.random()); }
 
     constructor(shape, name) {
         super();
@@ -57,6 +54,10 @@ export default class BaseShapeEditor extends EventEmitter {
         this._container = new SvgGroup(this._canvasSize);
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
         this._canvas.appendChild(this.container.el);
+    }
+
+    rerender() {
+        this._canvasPositionProvider.clear();
     }
 
     onActivated() {

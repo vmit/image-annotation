@@ -10,17 +10,23 @@ export default class SvgPolygonEditable extends SvgGroup {
         this._prepareLines(points);
         this._polygonElement.points = points;
     }
+    get canvasSize() { return this._polygonElement.canvasSize; }
 
-    constructor(points, canvasSize, onAddPoint) {
-        super(canvasSize);
+    constructor(points, canvasSizeProvider, onAddPoint) {
+        super(canvasSizeProvider);
 
+        this._points = points;
         this._onAddPoint = onAddPoint;
         this._lineElements = [];
-        this._polygonElement = new SvgPolygon(points, canvasSize);
+        this._polygonElement = new SvgPolygon(points, canvasSizeProvider);
 
         this.append(this._polygonElement);
 
         this._prepareLines(points);
+    }
+
+    render() {
+        this.points = this._points;
     }
 
     _prepareLines(points) {
@@ -34,7 +40,7 @@ export default class SvgPolygonEditable extends SvgGroup {
                 this._lineElements[i].start = start;
                 this._lineElements[i].end = end
             } else {
-                this._lineElements[i] = new SvgLine(start, end, this.canvasSize, 'polygon-overlay-line');
+                this._lineElements[i] = new SvgLine(start, end, this.canvasSizeProvider, 'polygon-overlay-line');
                 this._lineElements[i].el.addEventListener('dblclick', this._onLineDblClicked.bind(this, i));
                 this.append(this._lineElements[i]);
             }

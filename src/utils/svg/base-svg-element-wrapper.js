@@ -1,15 +1,16 @@
 
 export default class BaseSvgElementWrapper {
     get el() { return this._el; }
-    get canvasSize() { return this._canvasSize; }
+    get canvasSizeProvider() { return this._canvasSizeProvider; }
+    get canvasSize() { return this.canvasSizeProvider.get(); }
 
     /**
      * @param {string} type
      * @param {string} [name]
      */
-    constructor(type, canvasSize, name) {
+    constructor(type, canvasSizeProvider, name) {
         this._el = document.createElementNS("http://www.w3.org/2000/svg", type);
-        this._canvasSize = canvasSize;
+        this._canvasSizeProvider = canvasSizeProvider;
 
         this.addClass(`ia-element`);
         this.addClass(`ia-element-${name || type}`);
@@ -35,15 +36,17 @@ export default class BaseSvgElementWrapper {
      * @param value [0..1]
      */
     toPxX(value) {
-        return value * this._canvasSize.width;
+        return value * this.canvasSize.width;
     }
 
     /**
      * @param value [0..1]
      */
     toPxY(value) {
-        return value * this._canvasSize.height;
+        return value * this.canvasSize.height;
     }
+
+    render() {}
 
 }
 

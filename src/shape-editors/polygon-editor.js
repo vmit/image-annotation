@@ -19,9 +19,9 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _removePoint(point) {
-        const index = this._el.pointElements.indexOf(point);
+        const index = this._el.points.indexOf(point);
 
-        this._el.pointElements.splice(index, 1);
+        this._el.points.splice(index, 1);
         this.shape.data.splice(index, 1);
         this._el.polygon.points = this.shape.data;
         this.remove(point);
@@ -30,16 +30,16 @@ export default class PolygonEditor extends BaseShapeEditor {
             this.emit('shape:editor:remove', this);
             this.removeFromCanvas();
         } else {
-            this._activatePoint(this._el.pointElements[index] || this._el.pointElements[index-1]);
+            this._activatePoint(this._el.points[index] || this._el.points[index-1]);
         }
 
-        this.emit('shape:editor:updated', this.shape);
+        this.emit('shape:editor:updated', this);
     }
 
-    _addPoint(point, position = this._el.pointElements.length) {
-        const pointElement = new SvgPointDraggable(point, this.canvasSize, this._onPointDragged.bind(this), this._onPointDropped.bind(this));
+    _addPoint(point, position = this._el.points.length) {
+        const pointElement = new SvgPointDraggable(point, this.canvasSizeProvider, this._onPointDragged.bind(this), this._onPointDropped.bind(this));
         this.append(pointElement);
-        this._el.pointElements.splice(position, 0, pointElement);
+        this._el.points.splice(position, 0, pointElement);
         pointElement.el.addEventListener('click', () => {
             this._activatePoint(pointElement);
             this.activate();
@@ -60,7 +60,7 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _onPointDragged() {
-        this._el.polygon.points = this.shape.data;
+        this._el.polygon.render();
     }
 
     _onPointDropped() {
@@ -78,11 +78,18 @@ export default class PolygonEditor extends BaseShapeEditor {
 
         this._el = {
             activePoint: null,
-            pointElements: [],
-            polygon: new SvgPolygonEditable(this.shape.data, this.canvasSize, this._onAddPoint.bind(this))
+            polygon: new SvgPolygonEditable(this.shape.data, this.canvasSizeProvider, this._onAddPoint.bind(this)),
+            points: []
         };
 
         this.append(this._el.polygon);
         this.shape.data.forEach(this._addPoint.bind(this));
+    }
+
+    rerender() {
+        super.rerender();
+
+        this._el.polygon.render();
+        this._el.points.forEach((point) => point.render());
     }
 }

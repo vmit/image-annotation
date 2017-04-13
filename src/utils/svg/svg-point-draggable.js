@@ -5,10 +5,11 @@ import SvgGroup from './svg-g';
 
 export default class SvgPointDraggable extends SvgGroup {
     get point() { return this._pointElement.point }
-    set point(value) {
-        this._pointUnderlayElement.point = value;
-        this._pointElement.point = value;
+    set point(point) {
+        this._pointUnderlayElement.point = point;
+        this._pointElement.point = point;
     }
+    get canvasSize() { return this._pointElement.canvasSize; }
 
     /**
      * @param point
@@ -39,6 +40,11 @@ export default class SvgPointDraggable extends SvgGroup {
         this._pointElement.removeClass('ia-active-point');
     }
 
+    render() {
+        this._pointUnderlayElement.render();
+        this._pointElement.render();
+    }
+
     _onMouseDown(event) {
         this._setDraggingMode(true);
     }
@@ -46,16 +52,19 @@ export default class SvgPointDraggable extends SvgGroup {
     _onMouseUp(event) {
         if (this._isDragging) {
             this._setDraggingMode(false);
-            const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-            this._onDrop(point);
+            this._onDrop({
+                x: normalizeX(event.clientX, this.canvasSize),
+                y: normalizeY(event.clientY, this.canvasSize)
+            });
         }
     }
 
     _onMouseMove(event) {
         if (this._isDragging) {
-            const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-            this.point = point;
-            this._onDrag(point);
+            this.point.x = normalizeX(event.clientX, this.canvasSize);
+            this.point.y = normalizeY(event.clientY, this.canvasSize);
+            this._onDrag(this.point);
+            this.render();
         }
     }
 
