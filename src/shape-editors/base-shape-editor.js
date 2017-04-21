@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import SvgGroup from '../utils/svg/svg-g';
 import ThrottledProvider from '../utils/throttled-provider';
 import assert from '../utils/assert';
+import throttle from 'lodash/throttle';
 
 
 export default class BaseShapeEditor extends EventEmitter {
@@ -55,6 +56,7 @@ export default class BaseShapeEditor extends EventEmitter {
         this._container = new SvgGroup(this._canvasSize);
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
         this._canvas.appendChild(this.container.el);
+        this._container.el.addEventListener('mouseenter', throttle(this.emit.bind(this, 'shape:editor:focus', this), 100, { trailing: false }))
     }
 
     rerender() {

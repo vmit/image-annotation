@@ -75,11 +75,10 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
     }
 
     _onFirstPointCLick(e) {
-        const isClosed = this._closePolygon();
-        if (!isClosed) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
+        this._closePolygon();
+
+        e.stopPropagation();
+        e.preventDefault();
     }
 
     _closePolygon() {

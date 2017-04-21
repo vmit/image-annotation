@@ -3,8 +3,13 @@
     fill: #ffd633;
     fill-opacity: 0.3;
     stroke-opacity: 0.9;
+
     stroke-width: 1px;
-    transition: stroke-width 0.3s;
+    transition: stroke-width 0.3s, fill-opacity 0.3s;
+}
+
+.ia-canvas *:hover {
+    fill-opacity: 0.4;
 }
 
 /*

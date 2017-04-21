@@ -37,6 +37,25 @@
     cursor: pointer;
     user-select: none;
 }
+.image-annotation-editor__annotation-layer {
+    position: relative;
+    max-width: 100%;
+    overflow: visible;
+}
+.image-annotation-editor__annotation-interface {
+    position: absolute;
+    min-width: 150px;
+    background: #fff;
+    padding: 7px;
+    user-select: auto;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.4);
+    opacity: 0;
+}
+.image-annotation-editor__annotation-interface_visible {
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
 .image-annotation-editor__canvas-zoomer {
     overflow: auto;
     max-width: 100%;
@@ -58,6 +77,7 @@
     height: 100%;
     outline: none;
 }
+
 .image-annotation-editor__tools {
     position: absolute;
     top: 0;

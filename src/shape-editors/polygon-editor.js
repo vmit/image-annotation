@@ -32,7 +32,7 @@ export default class PolygonEditor extends BaseShapeEditor {
             this._activatePoint(this._el.points[index] || this._el.points[index-1]);
         }
 
-        this.emit('shape:editor:updated', this);
+        this.emit('shape:editor:update', this);
     }
 
     _addPoint(point, position = this._el.points.length) {
@@ -63,13 +63,13 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _onPointDropped() {
-        this.emit('shape:editor:updated', this.shape);
+        this.emit('shape:editor:update', this.shape);
     }
 
     _onAddPoint(point, position) {
         this._activatePoint(this._addPoint(point, position));
 
-        this.emit('shape:editor:updated', this.shape);
+        this.emit('shape:editor:update', this.shape);
     }
 
     _onActivePointRemove() {
