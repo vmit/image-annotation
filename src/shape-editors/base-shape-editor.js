@@ -60,7 +60,7 @@ export default class BaseShapeEditor extends EventEmitter {
     }
 
     rerender() {
-        this._canvasPositionProvider.clear();
+        this._canvasPositionProvider.reset();
     }
 
     onActivated() {
