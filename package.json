@@ -5,14 +5,20 @@
   "author": "Dmitry Vykochko",
   "main": "build/image-annotation-editor.bundle.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/webpack/bin/webpack.js",
-    "watch": "./node_modules/webpack/bin/webpack.js --watch"
+    "watch": "./node_modules/webpack/bin/webpack.js --watch",
+    "test": "./node_modules/karma/bin/karma start karma.config.js",
+    "test_watch": "./node_modules/karma/bin/karma start --auto-watch --no-single-run karma.config.js"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.1",
     "babel-preset-es2015": "^6.24.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.6.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-webpack": "^2.0.3",
+    "karma-yandex-launcher": "^0.1.8",
     "raw-loader": "^0.5.1",
     "webpack": "^2.3.2"
   },
