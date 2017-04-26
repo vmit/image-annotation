@@ -27,6 +27,21 @@ export default class Editor extends EventEmitter {
     }
 
     /**
+     * @return {number} - zoom level in percentages
+     */
+    get zoom() { return this._zoom; }
+
+    /**
+     * @param {number} zoom - level in percentages, min: 20%, max: 1000%, the value is clamped
+     */
+    set zoom(zoom) {
+        this._zoom = Math.min(Math.max(zoom, 20), 1000);
+        this._el.container.style.width = `${this._zoom}%`;
+        this._shapeEditors.forEach((shapeEditor) => shapeEditor.rerender());
+        this.hideAnnotation();
+    }
+
+    /**
      * @param {string} imageUrl - URL of the image to be annotated
      * @param {Array<Shape>} [shapes=[]] - list of already created shapes
      * @param {ShapeEditorFactory} [shapeEditorFactory=new ShapeEditorFactory()]
@@ -40,7 +55,6 @@ export default class Editor extends EventEmitter {
         this._shapeEditors = [];
         this._annotationInterface = null;
         this._activeShapeEditor = null;
-        this._zoomValue = null;
         this._canvasPositionProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
     }
 
@@ -80,8 +94,8 @@ export default class Editor extends EventEmitter {
         };
 
         this._el.image.addEventListener('load', () => { this._renderShapes(); this.emit('image:load'); });
-        this._el.zoomIn.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue * 1.15)));
-        this._el.zoomOut.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue / 1.15)));
+        this._el.zoomIn.addEventListener('click', (e) => this.zoom *= 1.15);
+        this._el.zoomOut.addEventListener('click', (e) => this.zoom /= 1.15);
         this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
         this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
 
@@ -91,7 +105,7 @@ export default class Editor extends EventEmitter {
         }));
 
         this._el.image.src = this._imageUrl;
-        this._zoom(100);
+        this.zoom = 100;
     }
 
     _renderShapes() {
@@ -150,16 +164,6 @@ export default class Editor extends EventEmitter {
         }
         if (this._el.newShapes.__active__ = this._el.newShapes[type]) {
             this._el.newShapes.__active__.classList.add('image-annotation-editor__shape_active');
-        }
-    }
-
-    _zoom(value) {
-        // min/max scale: 10%/1000%
-        if (value >= 10 && value <= 1000) {
-            this._zoomValue = value;
-            this._el.container.style.width = `${value}%`;
-            this._shapeEditors.forEach((shapeEditor) => shapeEditor.rerender());
-            this.hideAnnotation();
         }
     }
 

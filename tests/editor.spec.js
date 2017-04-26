@@ -37,6 +37,15 @@ describe('Editor', () => {
         spyOn(shapeEditorFactory, 'createNewEditor').and.callThrough();
         spyOn(shapeEditorFactory, 'createEditor').and.callThrough();
         editor.render(container);
+
+        // important for accurate calculation of zoomed image width
+        container.style.width = '300px';
+        document.body.appendChild(container);
+    });
+
+
+    afterEach(() => {
+        document.body.removeChild(container);
     });
 
     it('should render shapes after successful image loading', (done) => {
@@ -67,6 +76,34 @@ describe('Editor', () => {
 
         shapeEditorFactory.latestNewEditor.emit('new:shape:editor:cancel', shapeEditorFactory.latestNewEditor);
         expect(editor.shapes.length).toBe(0);
+    });
+
+    it('should zoom', (done) => {
+        editor.on('image:load', () => {
+            const image = container.querySelector('.image-annotation-editor__image');
+            const initWidth = parseInt(getComputedStyle(image).width);
+
+            expect(editor.zoom).toBe(100);
+
+            editor.zoom = 50;
+            expect(editor.zoom).toBe(50);
+            expect(parseFloat(getComputedStyle(image).width)).toBe(initWidth * 0.5);
+
+            editor.zoom = 150;
+            expect(editor.zoom).toBe(150);
+            expect(parseFloat(getComputedStyle(image).width)).toBe(initWidth * 1.5);
+
+            editor.zoom = 10;
+            expect(editor.zoom).toBe(20);
+            expect(parseFloat(getComputedStyle(image).width)).toBe(initWidth * 0.20);
+
+            editor.zoom = 10000000000;
+            expect(editor.zoom).toBe(1000);
+            expect(parseFloat(getComputedStyle(image).width)).toBe(initWidth * 10);
+        });
+
+        editor.on('image:load', done);
+
     });
 
 
