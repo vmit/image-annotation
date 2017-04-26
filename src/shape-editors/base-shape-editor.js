@@ -4,7 +4,15 @@ import ThrottledProvider from '../utils/throttled-provider';
 import assert from '../utils/assert';
 import throttle from 'lodash/throttle';
 
-
+/**
+ * Base class for shape editing.
+ *
+ * Subclasses should emit the following events:
+ *   'shape:editor:activate' - on activation of the editor, e.g. click on its point
+ *   'shape:editor:focus' - a lighter version of 'shape:editor:activate', could be emitted on hover
+ *   'shape:editor:update' - when editing shape was updated
+ *   'shape:editor:remove' - when editing shape was removed
+ */
 export default class BaseShapeEditor extends EventEmitter {
     get container() { return this._container; }
     get shape() { return this._shape; }

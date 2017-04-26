@@ -58,7 +58,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         this.shape.data.pop();
 
         if (this.shape.data.length == 0) {
-            this.emit('shape:cancel', this.shape);
+            this.emit('new:shape:editor:cancel', this.shape);
         } else {
             this._el.polyline.points = this.shape.data;
             this._el.activeLine.start = this.shape.data[this.shape.data.length - 1];
@@ -83,7 +83,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
     _closePolygon() {
         if (this.shape.data.length > 2) {
-            this.emit('shape:new', this);
+            this.emit('new:shape:editor:create', this);
 
             return true;
         }

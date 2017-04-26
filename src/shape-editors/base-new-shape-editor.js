@@ -11,6 +11,14 @@ class SvgOverlay extends BaseSvgElementWrapper {
     }
 }
 
+/**
+ * Base class for creating a new shape. Creating "new" shapes is a different UX from "existing" ones,
+ * that is why they have separate branch.
+ *
+ * Subclasses should emit the following events:
+ *   'new:shape:editor:create' - when editing shape is finished
+ *   'new:shape:editor:cancel' - when editing shape is canceled
+ */
 export default class BaseNewShapeEditor extends BaseShapeEditor {
     get overlay() { return this._overlay; }
 

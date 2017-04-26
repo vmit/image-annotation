@@ -7,7 +7,8 @@ module.exports = function (config) {
     config.set({
         frameworks: [ 'jasmine' ],
         files: [
-            'tests/**/*.spec.js'
+            'tests/**/*.spec.js',
+            { pattern: 'tests/_assets/**/*', included: false }
         ],
         plugins: [ webpack, 'karma-jasmine', 'karma-yandex-launcher' ],
         browsers: [ 'Yandex' ],

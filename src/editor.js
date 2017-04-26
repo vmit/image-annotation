@@ -1,25 +1,42 @@
+import './styles/editor.css';
+import './styles/canvas.svg.css';
+import './styles/shapes.svg.css';
+import './data-types/shape';
 import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import assert from './utils/assert';
 import Keys from './utils/keys';
 import ThrottledProvider from './utils/throttled-provider';
-import shapeEditorFactory from './shape-editors/shape-editor-factory';
-import './styles/editor.css';
-import './styles/canvas.svg.css';
-import './styles/shapes.svg.css';
+import ShapeEditorFactory from './shape-editors/shape-editor-factory';
 
 
+/**
+ * This class wraps all the functionality of image annotation and basically is the main interface for clients.
+ * After creation it should be rendered into container DOM element. Container's content will be <b>replaced</b>
+ * with editor's markup.
+ *
+ * @example
+ * let editor = new Editor('http://example.com/iamge.png', [<already created shapes if any>]);
+ * let container = document.getElementById('annotation-editor');
+ * editor.render(container);
+ */
 export default class Editor extends EventEmitter {
     get shapes() { return this._shapes; }
     set annotationInterface(annotationInterface) {
         this._annotationInterface = annotationInterface;
     }
 
-    constructor(imageUrl, shapes = []) {
+    /**
+     * @param {string} imageUrl - URL of the image to be annotated
+     * @param {Array<Shape>} [shapes=[]] - list of already created shapes
+     * @param {ShapeEditorFactory} [shapeEditorFactory=new ShapeEditorFactory()]
+     */
+    constructor(imageUrl, shapes = [], shapeEditorFactory = new ShapeEditorFactory()) {
         super();
 
         this._imageUrl = imageUrl;
         this._shapes = shapes;
+        this._shapeEditorFactory = shapeEditorFactory;
         this._shapeEditors = [];
         this._annotationInterface = null;
         this._activeShapeEditor = null;
@@ -62,14 +79,11 @@ export default class Editor extends EventEmitter {
             }
         };
 
-        this._el.image.addEventListener('load', () => this._renderShapes());
+        this._el.image.addEventListener('load', () => { this._renderShapes(); this.emit('image:load'); });
         this._el.zoomIn.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue * 1.15)));
         this._el.zoomOut.addEventListener('click', (e) => this._zoom(Math.round(this._zoomValue / 1.15)));
         this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
-
-        this._el.newShapes.polygon.addEventListener('click', () => {
-            this._appendNewShapeEditor(shapeEditorFactory.createNewEditor('polygon'));
-        });
+        this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
 
         this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
             let key = Keys.fromKeyCode(e.keyCode);
@@ -82,25 +96,26 @@ export default class Editor extends EventEmitter {
 
     _renderShapes() {
         this._el.canvas.textContent = '';
-        this._shapes.forEach((shape) => this._appendShapeEditor(shapeEditorFactory.createEditor(shape)));
+        this._shapes.forEach((shape) => this._appendShapeEditor(this._shapeEditorFactory.createEditor(shape)));
     }
 
     _appendShapeEditor(shapeEditor) {
         this._shapeEditors.push(shapeEditor);
 
         shapeEditor.render(this._el.canvas);
-        shapeEditor.on('shape:editor:activate', this._activateShapeEditor.bind(this, shapeEditor));
-        shapeEditor.on('shape:editor:remove', this._onRemoveShape.bind(this, shapeEditor));
-        shapeEditor.on('shape:editor:update', this.emit.bind(this, 'shapes:update', this.shapes));
-        shapeEditor.on('shape:editor:focus', this.showAnnotation.bind(this, shapeEditor.shape));
+        shapeEditor.on('shape:editor:activate', this._onShapeActivate.bind(this, shapeEditor));
+        shapeEditor.on('shape:editor:update', this._onShapeUpdate.bind(this, shapeEditor));
+        shapeEditor.on('shape:editor:remove', this._onShapeRemove.bind(this, shapeEditor));
+        shapeEditor.on('shape:editor:focus', this._onShapeFocus.bind(this, shapeEditor));
     }
 
     _appendNewShapeEditor(newShapeEditor) {
         this._shapeEditors.push(newShapeEditor);
 
         newShapeEditor.render(this._el.canvas);
-        newShapeEditor.on('shape:new', this._onNewShape.bind(this));
-        newShapeEditor.on('shape:cancel', this._onCancelShape.bind(this));
+        newShapeEditor.on('new:shape:editor:create', this._onShapeCreate.bind(this));
+        newShapeEditor.on('new:shape:editor:cancel', this._onShapeCancel.bind(this));
+
         this._activateShapeEditor(newShapeEditor);
         this._setNewShapeMode(newShapeEditor.shape.type);
 
@@ -109,6 +124,7 @@ export default class Editor extends EventEmitter {
 
     _activateShapeEditor(shapeEditor) {
         this._activeShapeEditor = shapeEditor;
+        // emitting must be here (not at the end of the method) because subsequent code depends on it
         this.emit('shape:editor:activated', shapeEditor);
 
         if (this._el.shapeControls) {
@@ -147,32 +163,68 @@ export default class Editor extends EventEmitter {
         }
     }
 
-    _onNewShape(shapeEditor) {
-        // "new" editor is on the top, and should be removed
-        this._shapeEditors.pop();
+    /**
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
+    _onShapeActivate(shapeEditor) {
+        this._activateShapeEditor(shapeEditor);
+    }
 
-        this._activateShapeEditor(null);
-        this._setNewShapeMode(null);
-        this._shapes.push(shapeEditor.shape);
-        this._appendShapeEditor(shapeEditorFactory.createEditor(shapeEditor.shape));
-
-        this.showAnnotation(shapeEditor.shape);
-
-        this.emit('shape:finish', shapeEditor.shape);
+    /**
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
+    _onShapeUpdate(shapeEditor) {
         this.emit('shapes:update', this.shapes);
     }
 
-    _onCancelShape(shapeEditor) {
+    /**
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
+    _onShapeFocus(shapeEditor) {
+        this.showAnnotation(shapeEditor.shape);
+    }
+
+    /**
+     * @param {BaseNewShapeEditor} newShapeEditor
+     * @private
+     */
+    _onShapeCreate(newShapeEditor) {
+        // "new" editor is on the top, and should be removed
+        this._shapeEditors.pop();
+
+        this._activateShapeEditor(null);
+        this._setNewShapeMode(null);
+        this._shapes.push(newShapeEditor.shape);
+        this._appendShapeEditor(this._shapeEditorFactory.createEditor(newShapeEditor.shape));
+
+        this.showAnnotation(newShapeEditor.shape);
+
+        this.emit('shape:finish', newShapeEditor.shape);
+        this.emit('shapes:update', this.shapes);
+    }
+
+    /**
+     * @param {BaseNewShapeEditor} newShapeEditor
+     * @private
+     */
+    _onShapeCancel(newShapeEditor) {
         // "new" editor is on the top, and should be removed
         this._shapeEditors.pop();
 
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
 
-        this.emit('shape:cancel', shapeEditor.shape);
+        this.emit('shape:cancel', newShapeEditor.shape);
     }
 
-    _onRemoveShape(shapeEditor) {
+    /**
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
+    _onShapeRemove(shapeEditor) {
         this._activateShapeEditor(null);
         this.hideAnnotation();
         this._shapes.splice(this._shapes.indexOf(shapeEditor.shape), 1);
