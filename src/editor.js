@@ -58,6 +58,12 @@ export default class Editor extends EventEmitter {
         this._canvasPositionProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
     }
 
+    /**
+     * Shows annotation interface (its DOM elements).
+     *
+     * @param {Shape} shape - which shape to be annotated, passed to annotation interface
+     * @param {*} options - arbitrary options to pass to annotation interface
+     */
     showAnnotation(shape, options) {
         // annotation could not be provided, and nothing to show in that case
         if (this._annotationInterface) {
@@ -68,6 +74,9 @@ export default class Editor extends EventEmitter {
         }
     }
 
+    /**
+     * Hides annotation interface (its DOM elements).
+     */
     hideAnnotation() {
         if (this._annotationInterface && this._annotationInterface.isVisible()) {
             this._annotationInterface.hide();
@@ -98,21 +107,31 @@ export default class Editor extends EventEmitter {
         this._el.zoomOut.addEventListener('click', (e) => this.zoom /= 1.15);
         this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
         this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
-
-        this._el.canvas.addEventListener('keydown', (e) => this._withActiveShapeEditor((activeShapeEditor) => {
+        this._el.canvas.addEventListener('keydown', (e) => {
             let key = Keys.fromKeyCode(e.keyCode);
-            key && activeShapeEditor.onCanvasKeyPressed(key);
-        }));
+            key && this._activeShapeEditor && this._activeShapeEditor.onCanvasKeyPressed(key);
+        });
 
         this._el.image.src = this._imageUrl;
         this.zoom = 100;
     }
 
+    /**
+     * Renders shapes (clears canvas preliminarily).
+     *
+     * @private
+     */
     _renderShapes() {
         this._el.canvas.textContent = '';
         this._shapes.forEach((shape) => this._appendShapeEditor(this._shapeEditorFactory.createEditor(shape)));
     }
 
+    /**
+     * Renders shape editor on canvas.
+     *
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
     _appendShapeEditor(shapeEditor) {
         this._shapeEditors.push(shapeEditor);
 
@@ -123,6 +142,12 @@ export default class Editor extends EventEmitter {
         shapeEditor.on('shape:editor:focus', this._onShapeFocus.bind(this, shapeEditor));
     }
 
+    /**
+     * Renders new shape editor on canvas.
+     *
+     * @param {BaseNewShapeEditor} newShapeEditor
+     * @private
+     */
     _appendNewShapeEditor(newShapeEditor) {
         this._shapeEditors.push(newShapeEditor);
 
@@ -136,6 +161,13 @@ export default class Editor extends EventEmitter {
         this.emit('shape:start');
     }
 
+    /**
+     * Activates shape editor. Activation means settings context specific controls thus
+     * visually making shape editor "current" for the user.
+     *
+     * @param {BaseShapeEditor} shapeEditor
+     * @private
+     */
     _activateShapeEditor(shapeEditor) {
         this._activeShapeEditor = shapeEditor;
         // emitting must be here (not at the end of the method) because subsequent code depends on it
@@ -158,6 +190,12 @@ export default class Editor extends EventEmitter {
         this._activeShapeEditor && cb(this._activeShapeEditor);
     }
 
+    /**
+     * Make shape icon "active" thus indicating the context for the user.
+     *
+     * @param {string} type - supported shape type
+     * @private
+     */
     _setNewShapeMode(type) {
         if (this._el.newShapes.__active__) {
             this._el.newShapes.__active__.classList.remove('image-annotation-editor__shape_active');
