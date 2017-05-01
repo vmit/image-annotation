@@ -12,6 +12,8 @@ import throttle from 'lodash/throttle';
  *   'shape:editor:focus' - a lighter version of 'shape:editor:activate', could be emitted on hover
  *   'shape:editor:update' - when editing shape was updated
  *   'shape:editor:remove' - when editing shape was removed
+ *
+ * @abstract
  */
 export default class BaseShapeEditor extends EventEmitter {
     get container() { return this._container; }
@@ -20,15 +22,24 @@ export default class BaseShapeEditor extends EventEmitter {
     get canvasSizeProvider() { return this._canvasPositionProvider; }
     get canvasSize() { return this.canvasSizeProvider.get(); }
     get id() { return this._id || (this._id = `shape-editor_` + Math.random()); }
-    get controls() { return []; }
+    get controls() { return this._controls; }
+    set controls(controls) {
+        this._controls = controls;
+        this.emit('controls:change', controls);
+    }
 
-    constructor(shape, name) {
+    /**
+     * @param {Shape} shape
+     * @param {string} [name=shape.type]
+     */
+    constructor(shape, name=shape.type) {
         super();
 
         this._shape = shape;
-        this._name = name || shape.type;
+        this._name = name;
         this._isActive = false;
         this._canvasPositionProvider = new ThrottledProvider(() => this.canvas.getBoundingClientRect());
+        this._controls = [];
         this._container = null;
         this._canvas = null;
         this._canvasSize = null;

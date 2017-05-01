@@ -6,6 +6,7 @@ import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import assert from './utils/assert';
 import Keys from './utils/keys';
+import ShapeControls from './editor__shape-editor-controls';
 import ThrottledProvider from './utils/throttled-provider';
 import ShapeEditorFactory from './shape-editors/shape-editor-factory';
 
@@ -62,7 +63,7 @@ export default class Editor extends EventEmitter {
      * Shows annotation interface (its DOM elements).
      *
      * @param {Shape} shape - which shape to be annotated, passed to annotation interface
-     * @param {*} options - arbitrary options to pass to annotation interface
+     * @param {*} [options] - arbitrary options to pass to annotation interface
      */
     showAnnotation(shape, options) {
         // annotation could not be provided, and nothing to show in that case
@@ -179,7 +180,7 @@ export default class Editor extends EventEmitter {
         }
 
         if (shapeEditor != null) {
-            this._el.shapeControls = new Editor.ShapeControls(shapeEditor, this._el.tools);
+            this._el.shapeControls = new ShapeControls(shapeEditor, this._el.tools);
 
             shapeEditor.onActivated();
             this.once('shape:editor:activated', () => shapeEditor.onDeactivated());
@@ -274,58 +275,5 @@ export default class Editor extends EventEmitter {
 
         this.emit('shape:remove', shapeEditor.shape);
         this.emit('shapes:update', this.shapes);
-    }
-}
-
-Editor.ShapeControls = class {
-    constructor(shapeEditor, container) {
-        this._shapeEditor = shapeEditor;
-        this._container = container;
-        this._el = document.createElement('div');
-        this._el.setAttribute('class', 'image-annotation-editor__tools-group image-annotation-editor__shape-controls');
-
-        shapeEditor.on('controls:change', this._onControlsChange = (controls) => this._renderControls(controls));
-
-        this._renderControls(shapeEditor.controls);
-    }
-
-    remove() {
-        this._removeFromContainer();
-        this._shapeEditor.removeListener('controls:change', this._onControlsChange);
-    }
-
-    _addToContainer() {
-        if (!this._container.contains(this._el)) {
-            this._container.appendChild(this._el);
-        }
-    }
-
-    _removeFromContainer() {
-        if (this._container.contains(this._el)) {
-            this._container.removeChild(this._el);
-        }
-    }
-
-    _renderControls(controls) {
-        while(this._el.hasChildNodes()) {
-            this._el.removeChild(this._el.lastChild);
-        }
-
-        controls = controls.filter((control) => !control.hidden);
-
-        controls.forEach((control) => {
-            const controlElement = document.createElement('div');
-            controlElement.setAttribute('class', `image-annotation-editor__font-icon`);
-            controlElement.innerHTML = `${control.title}`;
-            controlElement.addEventListener('click', control.action);
-
-            this._el.appendChild(controlElement);
-        });
-
-        if (controls.length > 0) {
-            this._addToContainer();
-        } else {
-            this._removeFromContainer();
-        }
     }
 }

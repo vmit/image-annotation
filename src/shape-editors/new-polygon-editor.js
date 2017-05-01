@@ -4,22 +4,15 @@ import SvgPoint from '../utils/svg/svg-point';
 import SvgLine from '../utils/svg/svg-line';
 import SvgPolyline from '../utils/svg/svg-polyline';
 import Keys from '../utils/keys';
+import { ControlsBuilder, BackControlDescription as Back, RemoveControlDescription as Remove } from './base-shape-editor__controls';
 
 
 export default class NewPolygonEditor extends BaseNewShapeEditor {
-    get controls() { return [{
-        name: 'back',
-        title: '&#8617;',
-        hidden: this.shape.data.length === 0,
-        action: this._removeLastPoint.bind(this)
-    }, {
-        name: 'remove',
-        title: '&#215;',
-        action: this._onRemove.bind(this)
-    }]};
-
     constructor() {
         super({ type: 'polygon', data: [] }, 'new-polygon');
+        this._controlsBuilder = new ControlsBuilder([new Back(this._removeLastPoint.bind(this)), new Remove(this._onRemove.bind(this)) ]);
+
+        this.controls = this._controlsBuilder.enable(Remove.id).build();
     }
 
     onCanvasKeyPressed(key) {
@@ -42,6 +35,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         if (this.shape.data.length == 0) {
             pointElement.addClass('ia-first-point');
             pointElement.el.addEventListener('click', this._onFirstPointCLick.bind(this));
+            this.controls = this._controlsBuilder.enable(Back.id).build();
         }
 
         this.shape.data.push(point);

@@ -1,29 +1,37 @@
 /**
  * Controls description data object.
  */
-export class BaseControlDescription {
+export class ControlDescription {
+    get id() { return this._id; }
+    get title() { return this._title; }
+    get action() { return this._action; }
+
     constructor(id, title, action) {
-        this.id = id;
-        this.title = title;
-        this.action = action;
+        this._id = id;
+        this._title = title;
+        this._action = action;
     }
 }
 
 /**
  * "back" control, titled with "↩"
  */
-export class BackControlDescription extends BaseControlDescription {
+export class BackControlDescription extends ControlDescription {
+    static get id() { return 'back'; }
+
     constructor(action) {
-        super('back', '&#8617;', action)
+        super(BackControlDescription.id, '&#8617;', action)
     }
 }
 
 /**
  * "remove" control, titled with "×"
  */
-export class RemoveControlDescription extends BaseControlDescription {
+export class RemoveControlDescription extends ControlDescription {
+    static get id() { return 'remove'; }
+
     constructor(action) {
-        super('remove', '&#215;', action)
+        super(RemoveControlDescription.id, '&#215;', action)
     }
 }
 

@@ -1,14 +1,21 @@
 import BaseShapeEditor from './base-shape-editor';
 import SvgPointDraggable from '../utils/svg/svg-point-draggable';
 import SvgPolygonEditable from '../utils/svg/svg-polygon-editable';
+import { ControlsBuilder, RemoveControlDescription as Remove } from './base-shape-editor__controls';
 
 
 export default class PolygonEditor extends BaseShapeEditor {
-    get controls() { return [{
-        name: 'remove',
-        title: '&#215;',
-        action: this._onActivePointRemove.bind(this)
-    }]};
+
+    /**
+     * @param {Shape} shape
+     * @param {string} [name=shape.type]
+     */
+    constructor(shape, name=shape.type) {
+        super(shape, name);
+
+        this._controlsBuilder = new ControlsBuilder([new Remove(this._onActivePointRemove.bind(this)) ]);
+        this.controls = this._controlsBuilder.enable(Remove.id).build();
+    }
 
     onDeactivated() {
         super.onDeactivated();
