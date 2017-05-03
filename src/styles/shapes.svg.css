@@ -1,3 +1,7 @@
+.image-annotation-editor__canvas .ia-shape {
+    outline: none;
+}
+
 .image-annotation-editor__canvas .ia-shape .ia-element-new-shape-overlay {
     fill-opacity: 0;
     stroke-opacity: 0;

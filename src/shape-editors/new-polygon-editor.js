@@ -3,7 +3,6 @@ import BaseNewShapeEditor from './base-new-shape-editor';
 import SvgPoint from '../utils/svg/svg-point';
 import SvgLine from '../utils/svg/svg-line';
 import SvgPolyline from '../utils/svg/svg-polyline';
-import Keys from '../utils/keys';
 import { ControlsBuilder, BackControlDescription as Back, RemoveControlDescription as Remove } from './base-shape-editor__controls';
 
 
@@ -15,10 +14,15 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         this.controls = this._controlsBuilder.enable(Remove.id).build();
     }
 
-    onCanvasKeyPressed(key) {
-        if (key === Keys.ESC) {
+    /**
+     * Reacts on ESC (removes last point) and ENTER (finishes polygon).
+     *
+     * @param {string} key
+     */
+    onKeyPressed(key) {
+        if (key === 'Escape') {
             this._removeLastPoint();
-        } else if (key === Keys.ENTER) {
+        } else if (key === 'Enter') {
             this._closePolygon();
         }
     }

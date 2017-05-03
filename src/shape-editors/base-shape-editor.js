@@ -5,7 +5,7 @@ import assert from '../utils/assert';
 import throttle from 'lodash/throttle';
 
 /**
- * Base class for shape editing.
+ * Base class for shape editors. Its interface
  *
  * Subclasses should emit the following events:
  *   'shape:editor:activate' - on activation of the editor, e.g. click on its point
@@ -73,11 +73,16 @@ export default class BaseShapeEditor extends EventEmitter {
     render(canvas) {
         this._canvas = canvas;
         this._container = new SvgGroup(this._canvasSize);
+        this._container.set('tabindex', 0);
         this._container.set('class', `${this._container.get('class')} ia-shape ia-shape-${this._name}`);
         this._canvas.appendChild(this.container.el);
         this._container.el.addEventListener('mouseenter', throttle(this.emit.bind(this, 'shape:editor:focus', this), 100, { trailing: false }))
+        this._container.el.addEventListener('keydown', (e) => this.onKeyPressed(e.key));
     }
 
+    /**
+     *
+     */
     rerender() {
         this._canvasPositionProvider.reset();
     }
@@ -90,6 +95,11 @@ export default class BaseShapeEditor extends EventEmitter {
         this._isActive = false;
     }
 
-    onCanvasKeyPressed(key) {}
+    /**
+     * Keyboard event listeners are set in this base class on the root element.
+     *
+     * @param {string} key - {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key}
+     */
+    onKeyPressed(key) {}
 
 }

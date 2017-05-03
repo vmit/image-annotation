@@ -5,7 +5,6 @@ import './data-types/shape';
 import editorMarkup from './editor.html';
 import EventEmitter from 'events';
 import assert from './utils/assert';
-import Keys from './utils/keys';
 import ShapeControls from './editor__shape-editor-controls';
 import ThrottledProvider from './utils/throttled-provider';
 import ShapeEditorFactory from './shape-editors/shape-editor-factory';
@@ -108,10 +107,6 @@ export default class Editor extends EventEmitter {
         this._el.zoomOut.addEventListener('click', (e) => this.zoom /= 1.15);
         this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
         this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
-        this._el.canvas.addEventListener('keydown', (e) => {
-            let key = Keys.fromKeyCode(e.keyCode);
-            key && this._activeShapeEditor && this._activeShapeEditor.onCanvasKeyPressed(key);
-        });
 
         this._el.image.src = this._imageUrl;
         this.zoom = 100;
@@ -185,10 +180,6 @@ export default class Editor extends EventEmitter {
             shapeEditor.onActivated();
             this.once('shape:editor:activated', () => shapeEditor.onDeactivated());
         }
-    }
-
-    _withActiveShapeEditor(cb) {
-        this._activeShapeEditor && cb(this._activeShapeEditor);
     }
 
     /**
