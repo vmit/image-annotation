@@ -1,6 +1,6 @@
 /**
  * This class wraps communication with particular shape editor about its controls.
- * List of controls can be changed ("controls:change" event).
+ * List of controls can be changed ("shape:editor:controls:change" event).
  */
 export default class ShapeEditorControls {
     constructor(shapeEditor, container) {
@@ -9,17 +9,17 @@ export default class ShapeEditorControls {
         this._el = document.createElement('div');
         this._el.setAttribute('class', 'image-annotation-editor__tools-group image-annotation-editor__shape-controls');
 
-        shapeEditor.on('controls:change', this._onControlsChange = (controls) => this._renderControls(controls));
+        shapeEditor.on('shape:editor:controls:change', this._onControlsChange = (controls) => this._renderControls(controls));
 
         this._renderControls(shapeEditor.controls);
     }
 
     /**
-     * Removes itself from container and stops listening to shape editor "controls:change".
+     * Removes itself from container and stops listening to shape editor "shape:editor:controls:change".
      */
     remove() {
         this._removeFromContainer();
-        this._shapeEditor.removeListener('controls:change', this._onControlsChange);
+        this._shapeEditor.removeListener('shape:editor:controls:change', this._onControlsChange);
     }
 
     _addToContainer() {

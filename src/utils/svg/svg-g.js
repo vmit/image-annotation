@@ -2,6 +2,9 @@ import BaseSvgElementWrapper from './base-svg-element-wrapper';
 
 
 export default class SvgGroup extends BaseSvgElementWrapper {
+    /**
+     * @param {Provider<CanvasSize>} canvasSizeProvider
+     */
     constructor(canvasSizeProvider) {
         super('g', canvasSizeProvider);
     }

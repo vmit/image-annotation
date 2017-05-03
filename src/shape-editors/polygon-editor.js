@@ -33,13 +33,12 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.remove(point);
 
         if (this.shape.data.length == 1) {
-            this.emit('shape:editor:remove', this);
             this.removeFromCanvas();
         } else {
             this._activatePoint(this._el.points[index] || this._el.points[index-1]);
         }
 
-        this.emit('shape:editor:update', this);
+        this.emitUpdate();
     }
 
     _addPoint(point, position = this._el.points.length) {
@@ -48,7 +47,7 @@ export default class PolygonEditor extends BaseShapeEditor {
         this._el.points.splice(position, 0, pointElement);
         pointElement.el.addEventListener('click', () => {
             this._activatePoint(pointElement);
-            this.activate();
+            this.emitActivate();
         });
 
         return pointElement;
@@ -56,12 +55,12 @@ export default class PolygonEditor extends BaseShapeEditor {
 
     _activatePoint(pointElement) {
         this._el.activePoint = pointElement;
-        this.emit('point:activate', pointElement);
+        this.emit('_inner:point:activate', pointElement);
 
         if (pointElement != null) {
             pointElement.activate();
             // only one active point is allowed
-            this.once('point:activate', () => pointElement.deactivate());
+            this.once('_inner:point:activate', () => pointElement.deactivate());
         }
     }
 
@@ -70,13 +69,13 @@ export default class PolygonEditor extends BaseShapeEditor {
     }
 
     _onPointDropped() {
-        this.emit('shape:editor:update', this.shape);
+        this.emitUpdate();
     }
 
     _onAddPoint(point, position) {
         this._activatePoint(this._addPoint(point, position));
 
-        this.emit('shape:editor:update', this.shape);
+        this.emitUpdate();
     }
 
     _onActivePointRemove() {

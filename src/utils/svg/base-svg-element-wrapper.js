@@ -13,7 +13,7 @@ export default class BaseSvgElementWrapper {
     /**
      * @param {string} type - one of supported by SVG tag name
      * @param {Provider<CanvasSize>} canvasSizeProvider - should return {CanvasSize} object
-     * @param {string} [name] - specifies class name to distinguish identical SVG elements with different roles
+     * @param {string} [name=type] - specifies class name to distinguish identical SVG elements with different roles
      */
     constructor(type, canvasSizeProvider, name=type) {
         this._el = document.createElementNS("http://www.w3.org/2000/svg", type);

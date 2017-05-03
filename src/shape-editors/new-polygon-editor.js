@@ -47,8 +47,6 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
 
         this.append(pointElement);
         this._el.polyline.points = this.shape.data;
-
-        this.emit('controls:change', this.controls);
     }
 
     _removeLastPoint() {

@@ -55,7 +55,7 @@ export default class Editor extends EventEmitter {
         this._shapeEditors = [];
         this._annotationInterface = null;
         this._activeShapeEditor = null;
-        this._canvasPositionProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
+        this._canvasSizeProvider = new ThrottledProvider(() => this._el.canvas.getBoundingClientRect());
     }
 
     /**
