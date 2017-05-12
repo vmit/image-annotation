@@ -9,7 +9,7 @@ import { ControlsBuilder, BackControlDescription as Back, RemoveControlDescripti
 export default class NewPolygonEditor extends BaseNewShapeEditor {
     constructor() {
         super({ type: 'polygon', data: [] }, 'new-polygon');
-        this._controlsBuilder = new ControlsBuilder([new Back(this._removeLastPoint.bind(this)), new Remove(this._onRemove.bind(this)) ]);
+        this._controlsBuilder = new ControlsBuilder([new Back(this._removeLastPoint.bind(this))]);
 
         this.controls = this._controlsBuilder.enable(Remove.id).build();
     }
