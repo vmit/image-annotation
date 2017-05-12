@@ -145,8 +145,6 @@ export default class Editor extends EventEmitter {
      * @private
      */
     _appendNewShapeEditor(newShapeEditor) {
-        this._shapeEditors.push(newShapeEditor);
-
         newShapeEditor.render(this._el.canvas);
         newShapeEditor.on('new:shape:editor:create', this._onShapeCreate.bind(this));
         newShapeEditor.on('new:shape:editor:cancel', this._onShapeCancel.bind(this));
@@ -226,9 +224,6 @@ export default class Editor extends EventEmitter {
      * @private
      */
     _onShapeCreate(newShapeEditor) {
-        // "new" editor is on the top, and should be removed
-        this._shapeEditors.pop();
-
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
         this._shapes.push(newShapeEditor.shape);
@@ -245,9 +240,6 @@ export default class Editor extends EventEmitter {
      * @private
      */
     _onShapeCancel(newShapeEditor) {
-        // "new" editor is on the top, and should be removed
-        this._shapeEditors.pop();
-
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
 
