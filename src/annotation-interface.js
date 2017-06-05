@@ -48,7 +48,7 @@ export default class AnnotationInterface {
 
             this._isVisible = true;
             this._shapeEditor = shapeEditor;
-            this.onShow(shapeEditor.shape, options);
+            this.onShow(shapeEditor.shape, shapeEditor.container.el, options);
         }
 
     }
@@ -100,10 +100,11 @@ export default class AnnotationInterface {
      * according to current shape and options.
      * No default implementation, must be implemented by subclass.
      *
-     * @param shape
-     * @param options
+     * @param {Shape} shape
+     * @param {HTMLElement} shapeElement
+     * @param {*} options
      */
-    onShow(shape, options) {
-        throw new Error('#onShow(shape, options) should be overridden');
+    onShow(shape, shapeElement, options) {
+        throw new Error('#onShow(shape, shapeElement, options) should be overridden');
     }
 }
