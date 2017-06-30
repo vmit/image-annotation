@@ -98,7 +98,8 @@ export default class Editor extends EventEmitter {
             shapeControls: null,
             newShapes: {
                 __active__: null,
-                polygon: container.querySelector('.image-annotation-editor__shape-polygon')
+                polygon: container.querySelector('.image-annotation-editor__shape-polygon'),
+                rectangle: container.querySelector('.image-annotation-editor__shape-rectangle')
             }
         };
 
@@ -107,6 +108,7 @@ export default class Editor extends EventEmitter {
         this._el.zoomOut.addEventListener('click', (e) => this.zoom /= 1.15);
         this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
         this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
+        this._el.newShapes.rectangle.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('rectangle')));
 
         this._el.image.src = this._imageUrl;
         this.zoom = 100;
@@ -224,6 +226,7 @@ export default class Editor extends EventEmitter {
      * @private
      */
     _onShapeCreate(newShapeEditor) {
+        console.log(newShapeEditor);
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
         this._shapes.push(newShapeEditor.shape);

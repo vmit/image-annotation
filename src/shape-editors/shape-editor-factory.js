@@ -1,6 +1,8 @@
 import '../data-types/shape';
 import PolygonEditor from './polygon-editor';
+import RectangleEditor from './rectangle-editor';
 import NewPolygonEditor from './new-polygon-editor';
+import NewRectangleEditor from './new-rectangle-editor';
 
 /**
  * Shape editors factory. Creates two types of editors: "finished" (subclasses of {@class BaseShapeEditor}) and
@@ -12,9 +14,11 @@ export default class ShapeEditorFactory {
      * @param {Object} [newEditors] - <type> => <new shape editor class> map
      */
     constructor(editors = {
-        'polygon': PolygonEditor
+        'polygon': PolygonEditor,
+        'rectangle': RectangleEditor
     }, newEditors = {
-        'polygon': NewPolygonEditor
+        'polygon': NewPolygonEditor,
+        'rectangle': NewRectangleEditor
     }) {
         this._editors = editors;
         this._newEditors = newEditors

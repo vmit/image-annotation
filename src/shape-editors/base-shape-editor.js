@@ -103,6 +103,8 @@ export default class BaseShapeEditor extends EventEmitter {
      */
     onDeactivated() {
         this._isActive = false;
+
+        this.removeFromCanvas();
     }
 
     /**

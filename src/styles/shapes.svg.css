@@ -29,6 +29,7 @@
     stroke-width: 4px;
 }
 
+/* polygon */
 .image-annotation-editor__canvas .ia-shape-polygon {
     stroke-width: 4px;
 }
@@ -45,6 +46,12 @@
     opacity: 0.7;
     fill: #ccc;
     stroke: #ccc;
+}
+
+/* rectangle */
+
+.image-annotation-editor__canvas .ia-shape-new-rectangle .ia-element-rect {
+    pointer-events: none;
 }
 
 @keyframes point-pulse {

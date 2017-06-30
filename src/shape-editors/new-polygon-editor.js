@@ -27,12 +27,6 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         }
     }
 
-    onDeactivated() {
-        super.onDeactivated();
-
-        this.removeFromCanvas();
-    }
-
     _addPoint(point) {
         const pointElement = new SvgPoint(point, this.canvasSizeProvider);
 
@@ -125,7 +119,7 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
             polyline: new SvgPolyline([], this.canvasSizeProvider, 'new-polygon-polyline'),
             activeLine: new SvgLine({ x: -1, y: -1 }, { x: -1, y: -1 }, this.canvasSizeProvider, 'active-line'),
             points: []
-        }
+        };
 
         this.append(this._el.polyline);
         this.append(this._el.activeLine);
