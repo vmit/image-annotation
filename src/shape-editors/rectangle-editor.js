@@ -17,6 +17,12 @@ export default class RectangleEditor extends BaseShapeEditor {
         this.controls = this._controlsBuilder.enable(Remove.id).build();
     }
 
+    onDeactivated() {
+        super.onDeactivated();
+
+        this._el.rect.deactivate();
+    }
+
     _onP1Drag() {
         this._el.rect.p1 = this._el.p1.point;
     }
@@ -29,13 +35,10 @@ export default class RectangleEditor extends BaseShapeEditor {
         this.emitUpdate();
     }
 
-    _onActivate(point) {
-        this._el.p1.deactivate();
-        this._el.p2.deactivate();
-
-        point.activate();
-
+    _onActivate() {
         this.emitActivate();
+
+        this._el.rect.activate();
     }
 
     _onRemove() {
@@ -52,8 +55,7 @@ export default class RectangleEditor extends BaseShapeEditor {
             p2: new SvgPointDraggable(this.shape.data.p2, this.canvasSizeProvider, this._onP2Drag.bind(this), this._onDrop.bind(this))
         };
 
-        this._el.p1.el.addEventListener('click', this._onActivate.bind(this, this._el.p1));
-        this._el.p2.el.addEventListener('click', this._onActivate.bind(this, this._el.p2));
+        this._el.rect.el.addEventListener('click', this._onActivate.bind(this));
 
         this.append(this._el.rect);
         this.append(this._el.p1);

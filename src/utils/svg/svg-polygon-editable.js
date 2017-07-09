@@ -25,6 +25,14 @@ export default class SvgPolygonEditable extends SvgGroup {
         this._prepareLines(points);
     }
 
+    activate() {
+        this._polygonElement.activate();
+    }
+
+    deactivate() {
+        this._polygonElement.deactivate();
+    }
+
     render() {
         this.points = this._points;
     }

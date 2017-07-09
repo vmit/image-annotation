@@ -29,12 +29,18 @@
     stroke-width: 4px;
 }
 
+.image-annotation-editor__canvas .ia-element_active {
+    fill: #f3a505;
+}
+
 /* polygon */
 .image-annotation-editor__canvas .ia-shape-polygon {
     stroke-width: 4px;
 }
 
 .image-annotation-editor__canvas .ia-shape-polygon .ia-active-point {
+    fill: #f3a505;
+    stroke: #f3a505;
     stroke-width: 4px;
 }
 

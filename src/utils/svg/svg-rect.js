@@ -29,6 +29,14 @@ export default class SvgRect extends BaseSvgElementWrapper {
         this.render();
     }
 
+    activate() {
+        this.addClass('ia-element_active');
+    }
+
+    deactivate() {
+        this.removeClass('ia-element_active');
+    }
+
     render() {
         if (this._p1 && this._p2) {
             const x = Math.min(this._p1.x, this._p2.x);

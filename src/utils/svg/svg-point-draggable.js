@@ -33,11 +33,11 @@ export default class SvgPointDraggable extends SvgGroup {
     }
 
     activate() {
-        this._pointElement.addClass('ia-active-point');
+        this._pointElement.activate('ia-active-point');
     }
 
     deactivate() {
-        this._pointElement.removeClass('ia-active-point');
+        this._pointElement.deactivate('ia-active-point');
     }
 
     render() {

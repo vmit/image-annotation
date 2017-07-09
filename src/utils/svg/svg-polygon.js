@@ -20,6 +20,14 @@ export default class SvgPolygon extends BaseSvgElementWrapper {
         this.render();
     }
 
+    activate() {
+        this.addClass('ia-element_active');
+    }
+
+    deactivate() {
+        this.removeClass('ia-element_active');
+    }
+
     render() {
         this.points = this._points;
     }

@@ -13,7 +13,7 @@ export default class PolygonEditor extends BaseShapeEditor {
     constructor(shape, name=shape.type) {
         super(shape, name);
 
-        this._controlsBuilder = new ControlsBuilder([new Remove(this._onActivePointRemove.bind(this)) ]);
+        this._controlsBuilder = new ControlsBuilder([new Remove(this._onRemove.bind(this)) ]);
         this.controls = this._controlsBuilder.enable(Remove.id).build();
     }
 
@@ -22,6 +22,7 @@ export default class PolygonEditor extends BaseShapeEditor {
 
         this._el.activePoint = null;
         this._activatePoint(null);
+        this._el.polygon.deactivate();
     }
 
     _removePoint(point) {
@@ -37,8 +38,6 @@ export default class PolygonEditor extends BaseShapeEditor {
         } else {
             this._activatePoint(this._el.points[index] || this._el.points[index-1]);
         }
-
-        this.emitUpdate();
     }
 
     _addPoint(point, position = this._el.points.length) {
@@ -58,6 +57,7 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.emit('_inner:point:activate', pointElement);
 
         if (pointElement != null) {
+            this._el.polygon.deactivate();
             pointElement.activate();
             // only one active point is allowed
             this.once('_inner:point:activate', () => pointElement.deactivate());
@@ -78,10 +78,20 @@ export default class PolygonEditor extends BaseShapeEditor {
         this.emitUpdate();
     }
 
-    _onActivePointRemove() {
+    _onRemove() {
         if (this._el.activePoint) {
             this._removePoint(this._el.activePoint);
+        } else {
+            this.removeFromCanvas();
         }
+
+        this.emitUpdate();
+    }
+
+    _onActivate() {
+        this._el.polygon.activate();
+        this._activatePoint(null);
+        this.emitActivate();
     }
 
     render(canvas) {
@@ -95,6 +105,8 @@ export default class PolygonEditor extends BaseShapeEditor {
 
         this.append(this._el.polygon);
         this.shape.data.forEach(this._addPoint.bind(this));
+
+        this._el.polygon.el.addEventListener('click', this._onActivate.bind(this));
     }
 
     rerender() {
