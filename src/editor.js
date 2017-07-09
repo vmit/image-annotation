@@ -211,6 +211,8 @@ export default class Editor extends EventEmitter {
      */
     _onShapeUpdate(shapeEditor) {
         this.emit('shapes:update', this.shapes);
+        this.hideAnnotation();
+        this.showAnnotation(shapeEditor.shape);
     }
 
     /**
@@ -226,7 +228,6 @@ export default class Editor extends EventEmitter {
      * @private
      */
     _onShapeCreate(newShapeEditor) {
-        console.log(newShapeEditor);
         this._activateShapeEditor(null);
         this._setNewShapeMode(null);
         this._shapes.push(newShapeEditor.shape);

@@ -43,7 +43,6 @@ export default class RectangleEditor extends BaseShapeEditor {
 
     _onRemove() {
         this.removeFromCanvas();
-        this.emitUpdate();
     }
 
     render(canvas) {

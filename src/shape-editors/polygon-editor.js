@@ -38,6 +38,8 @@ export default class PolygonEditor extends BaseShapeEditor {
         } else {
             this._activatePoint(this._el.points[index] || this._el.points[index-1]);
         }
+
+        this.emitUpdate();
     }
 
     _addPoint(point, position = this._el.points.length) {
@@ -84,8 +86,6 @@ export default class PolygonEditor extends BaseShapeEditor {
         } else {
             this.removeFromCanvas();
         }
-
-        this.emitUpdate();
     }
 
     _onActivate() {
