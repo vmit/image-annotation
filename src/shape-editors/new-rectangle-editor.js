@@ -11,15 +11,19 @@ export default class NewRectangleEditor extends BaseNewShapeEditor {
         this._isAnchorPointSet = false;
     }
 
-    _onClickOverlay(event) {
-        if (!this._isAnchorPointSet) { // open
+    _onMouseDown(event) {
+        if (!this._isAnchorPointSet) {
             const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize)};
 
             this._el.anchorPoint.point = point;
             this._el.rect.p1 = point;
 
             this._isAnchorPointSet = true;
-        } else { // close
+        }
+    }
+
+    _onMouseUp(event) {
+        if (this._isAnchorPointSet) {
             this.shape.data = {
                 p1: this._el.rect.p1,
                 p2: {
@@ -53,7 +57,8 @@ export default class NewRectangleEditor extends BaseNewShapeEditor {
         this.append(this._el.rect);
         this.append(this._el.anchorPoint);
 
-        this.overlay.el.addEventListener('click', this._onClickOverlay.bind(this));
+        this.overlay.el.addEventListener('mousedown', this._onMouseDown.bind(this));
+        this.overlay.el.addEventListener('mouseup', this._onMouseUp.bind(this));
         this.overlay.el.addEventListener('mousemove', this._onMouseMove.bind(this));
     }
 }
