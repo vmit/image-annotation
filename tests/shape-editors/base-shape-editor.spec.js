@@ -56,7 +56,7 @@ describe('BaseShapeEditor' , () => {
 
         baseShapeEditor.container.el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
 
-        expect(baseShapeEditor.onKeyPressed).toHaveBeenCalledWith('Enter');
+        expect(baseShapeEditor.onKeyPressed).toHaveBeenCalledWith('Enter', false, false);
 
     });
 

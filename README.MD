@@ -27,3 +27,16 @@ Property | Description
 
 ### Annotation Interface
 TODO
+
+
+### Hotkeys
+
+- `d` remove active shape
+
+##### Polygon:
+- `c` close polygon
+- `d` `z` remove active or last active point
+- `Up` move up active point along the X-axis(`alt+Up` smaller amount, `alt+shift+Up` bigger amount)
+- `Down` move down active point along the X-axis(`alt+Down` smaller amount, `alt+shift+Down` bigger amount)
+- `Left` move left active point along the Y-axis(`alt+Left` smaller amount, `alt+shift+Left` bigger amount)
+- `Right` move right active point along the Y-axis(`alt+Right` smaller amount, `alt+shift+Right` bigger amount)

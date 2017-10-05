@@ -46,6 +46,8 @@ export default class SvgPointDraggable extends SvgGroup {
     }
 
     _onMouseDown(event) {
+        event.stopPropagation();
+
         this._setDraggingMode(true);
     }
 

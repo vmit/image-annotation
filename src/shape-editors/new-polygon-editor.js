@@ -18,12 +18,20 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
      * Reacts on ESC (removes last point) and ENTER (finishes polygon).
      *
      * @param {string} key
+     * @param {boolean} altKey
+     * @param {boolean} shiftKey
      */
-    onKeyPressed(key) {
-        if (key === 'Escape') {
-            this._removeLastPoint();
-        } else if (key === 'Enter') {
-            this._closePolygon();
+    onKeyPressed(key, altKey, shiftKey) {
+        switch (key) {
+            case 'z':
+            case 'd':
+                this._removeLastPoint();
+                break;
+            case 'c':
+                this._closePolygon();
+                break;
+            default:
+                super.onKeyPressed(key, altKey, shiftKey);
         }
     }
 
@@ -81,11 +89,6 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         return false;
     }
 
-    _onClickOverlay(event) {
-        const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-        this._addPoint(point);
-    }
-
     /**
      * Tells the user (by visual effect) that the polygon is not closed.
      *
@@ -103,9 +106,32 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         this.container.el.classList.remove('ia-shape-new-polygon__not-finished');
     }
 
+    _onMouseDown(event) {
+        this._isMouseDown = true;
+        this._isOverlayDragged = false;
+    }
+
+    _onMouseUp(event) {
+        this._isMouseDown = false;
+
+        if (!this._isOverlayDragged) {
+            const point = {
+                x: normalizeX(event.clientX, this.canvasSize),
+                y: normalizeY(event.clientY, this.canvasSize)
+            };
+            this._addPoint(point);
+        }
+    }
+
     _onMouseMove(event) {
-        const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
-        this._updateActiveLine(point);
+        if (!this._isMouseDown) {
+            event.stopPropagation();
+
+            const point = { x: normalizeX(event.clientX, this.canvasSize), y: normalizeY(event.clientY, this.canvasSize) };
+            this._updateActiveLine(point);
+        } else {
+            this._isOverlayDragged = true;
+        }
     }
 
     _onRemove() {
@@ -124,8 +150,9 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
         this.append(this._el.polyline);
         this.append(this._el.activeLine);
 
-        this.overlay.el.addEventListener('click', this._onClickOverlay.bind(this));
         this.overlay.el.addEventListener('mousemove', this._onMouseMove.bind(this));
+        this.overlay.el.addEventListener('mousedown', this._onMouseDown.bind(this));
+        this.overlay.el.addEventListener('mouseup', this._onMouseUp.bind(this));
         this.overlay.el.addEventListener('mouseout', this._onOverlayMouseOut.bind(this));
         this.overlay.el.addEventListener('mouseenter', this._onOverlayMouseEnter.bind(this));
     }

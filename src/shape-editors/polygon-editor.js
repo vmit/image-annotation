@@ -25,6 +25,41 @@ export default class PolygonEditor extends BaseShapeEditor {
         this._el.polygon.deactivate();
     }
 
+
+    onKeyPressed(key, altKey, shiftKey) {
+        let pointMoveXGap = 20 / this.canvasSize.width;
+        let pointMoveYGap = 20 / this.canvasSize.height;
+        if (altKey && !shiftKey) {
+            pointMoveXGap *= 0.1;
+            pointMoveYGap *= 0.1;
+        } else if (altKey && shiftKey) {
+            pointMoveXGap *= 3;
+            pointMoveYGap *= 3;
+        }
+
+        switch (key) {
+            case 'd':
+                if (this._el.activePoint) {
+                    this._removePoint(this._el.activePoint);
+                    break;
+                }
+            case 'ArrowUp':
+                this._updateActivePointByArrowKey('y', pointMoveYGap * -1);
+                break;
+            case 'ArrowDown':
+                this._updateActivePointByArrowKey('y', pointMoveYGap);
+                break;
+            case 'ArrowLeft':
+                this._updateActivePointByArrowKey('x', pointMoveXGap * -1);
+                break;
+            case 'ArrowRight':
+                this._updateActivePointByArrowKey('x', pointMoveXGap);
+                break;
+            default:
+                super.onKeyPressed(key, altKey, shiftKey);
+        }
+    }
+
     _removePoint(point) {
         const index = this._el.points.indexOf(point);
 
@@ -48,7 +83,6 @@ export default class PolygonEditor extends BaseShapeEditor {
         this._el.points.splice(position, 0, pointElement);
         pointElement.el.addEventListener('click', () => {
             this._activatePoint(pointElement);
-            this.emitActivate();
         });
 
         return pointElement;
@@ -72,6 +106,28 @@ export default class PolygonEditor extends BaseShapeEditor {
 
     _onPointDropped() {
         this.emitUpdate();
+    }
+
+    /**
+     * Move the active point along axis on amount value
+     *
+     * @param {string="x","y"} axis The axis along which the point will be shifted
+     * @param {number} amount The distance the point will move along the axis
+     * @private
+     */
+    _updateActivePointByArrowKey(axis, amount) {
+        if (this._el.activePoint) {
+            this._el.activePoint.point[axis] += amount;
+
+            if (amount < 0 && this._el.activePoint.point[axis] < 0) {
+                this._el.activePoint.point[axis] = 0;
+            } else if (amount > 0 && this._el.activePoint.point[axis] > 1) {
+                this._el.activePoint.point[axis] = 1;
+            }
+
+            this._el.activePoint.render();
+            this._el.polygon.render();
+        }
     }
 
     _onAddPoint(point, position) {

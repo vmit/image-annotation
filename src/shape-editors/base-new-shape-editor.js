@@ -22,6 +22,10 @@ class SvgOverlay extends BaseSvgElementWrapper {
 export default class BaseNewShapeEditor extends BaseShapeEditor {
     get overlay() { return this._overlay; }
 
+    isNewShape() {
+        return true;
+    }
+
     onDeactivated() {
         super.onDeactivated();
 

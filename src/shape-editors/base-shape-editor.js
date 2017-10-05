@@ -91,6 +91,10 @@ export default class BaseShapeEditor extends EventEmitter {
         this._canvasSizeProvider.reset();
     }
 
+    isNewShape() {
+        return false;
+    }
+
     /**
      * Called by the annotation editor when this editor is activated (gets user's focus).
      */
@@ -109,8 +113,16 @@ export default class BaseShapeEditor extends EventEmitter {
      * Keyboard event listeners are set in this base class on the main container.
      *
      * @param {string} key - {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key}
+     * @param {boolean} altKey
+     * @param {boolean} shiftKey
      */
-    onKeyPressed(key) {}
+    onKeyPressed(key, altKey, shiftKey) {
+        switch (key) {
+            case 'd':
+                this.removeFromCanvas();
+                break;
+        }
+    }
 
     /**
      * Emits 'shape:editor:activate' event outside to show desire to be activated. However it is up to the
@@ -156,8 +168,12 @@ export default class BaseShapeEditor extends EventEmitter {
         container.set('tabindex', 0); // to be able to receive keyboard events
         container.addClass('ia-shape');
         container.addClass(`ia-shape-${name}`);
-        container.el.addEventListener('mouseenter', throttle(this.emit.bind(this, 'shape:editor:focus', this), 100, { trailing: false }))
-        container.el.addEventListener('keydown', (e) => this.onKeyPressed(e.key));
+        container.el.addEventListener('mouseenter', throttle(this.emit.bind(this, 'shape:editor:focus', this), 100, { trailing: false }));
+        container.el.addEventListener('keydown', (e) => {
+            e.preventDefault();
+
+            this.onKeyPressed(e.key, e.altKey, e.shiftKey);
+        });
 
         return container;
     }

@@ -43,8 +43,22 @@ export default class AnnotationInterface {
             // hide and show in setTimeout() to make some animation
             this.hide();
             setTimeout(() => container.classList.add('image-annotation-editor__annotation-interface_visible'), 100);
-            container.style.top = `${bBox.y + bBox.height + this.SHAPE_PADDING_PX}px`;
-            container.style.left = `${bBox.x}px`;
+
+            const overlay = container.parentNode;
+            let shapeBottomPosition = bBox.y + bBox.height + this.SHAPE_PADDING_PX;
+            if (shapeBottomPosition > (overlay.scrollTop + overlay.offsetHeight)) {
+                container.style.top = `auto`;
+                container.style.bottom = `${-overlay.scrollTop + this.SHAPE_PADDING_PX}px`;
+            } else {
+                container.style.top = `${shapeBottomPosition}px`;
+                container.style.bottom = `auto`;
+            }
+
+            let shapeLeftPosition = bBox.x;
+            if (shapeLeftPosition < overlay.scrollLeft) {
+                shapeLeftPosition = overlay.scrollLeft + this.SHAPE_PADDING_PX;
+            }
+            container.style.left = `${shapeLeftPosition}px`;
 
             this._isVisible = true;
             this._shapeEditor = shapeEditor;

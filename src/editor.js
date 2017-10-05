@@ -38,6 +38,7 @@ export default class Editor extends EventEmitter {
         this._zoom = Math.min(Math.max(zoom, 20), 1000);
         this._el.container.style.width = `${this._zoom}%`;
         this._shapeEditors.forEach((shapeEditor) => shapeEditor.rerender());
+        this._activeShapeEditor && this._activeShapeEditor.rerender();
         this.hideAnnotation();
     }
 
@@ -90,6 +91,7 @@ export default class Editor extends EventEmitter {
             image: container.querySelector('.image-annotation-editor__image'),
             container: container.querySelector('.image-annotation-editor__canvas-container'),
             canvas: container.querySelector('.image-annotation-editor__canvas'),
+            canvasZoomer: container.querySelector('.image-annotation-editor__canvas-zoomer'),
             annotationLayer: container.querySelector('.image-annotation-editor__annotation-layer'),
             annotationInterface: container.querySelector('.image-annotation-editor__annotation-interface'),
             zoomIn: container.querySelector('.image-annotation-editor__zoom-in'),
@@ -106,12 +108,52 @@ export default class Editor extends EventEmitter {
         this._el.image.addEventListener('load', () => { this._renderShapes(); this.emit('image:load'); });
         this._el.zoomIn.addEventListener('click', (e) => this.zoom *= 1.15);
         this._el.zoomOut.addEventListener('click', (e) => this.zoom /= 1.15);
-        this._el.annotationLayer.addEventListener('click', (e) => this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation());
+        this._el.annotationLayer.addEventListener('click', (e) => {
+            if (this._activeShapeEditor && !this._activeShapeEditor.isNewShape() && !this._activeShapeEditor._el.activePoint) {
+                this._activeShapeEditor.onDeactivated();
+            }
+            this._annotationInterface && !this._annotationInterface.isChild(e.target) && this.hideAnnotation();
+        });
         this._el.newShapes.polygon.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('polygon')));
         this._el.newShapes.rectangle.addEventListener('click', () => this._appendNewShapeEditor(this._shapeEditorFactory.createNewEditor('rectangle')));
 
+        this._el.annotationLayer.addEventListener('mousedown', this._onMouseDown.bind(this));
+        this._el.annotationLayer.addEventListener('mouseup', this._onMouseUp.bind(this));
+        this._el.annotationLayer.addEventListener('mousemove', this._onMouseMove.bind(this));
+
         this._el.image.src = this._imageUrl;
         this.zoom = 100;
+    }
+
+    _onMouseDown(event) {
+        this._previousCursorPoint  = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+    _onMouseUp(event) {
+        this._previousCursorPoint = null;
+    }
+
+    /**
+     * Move annotation layer using mouse
+     *
+     * @param {MouseEvent} event
+     * @private
+     */
+    _onMouseMove(event) {
+        if (this._previousCursorPoint) {
+            event.stopPropagation();
+
+            this._el.annotationLayer.scrollLeft = this._el.annotationLayer.scrollLeft + this._previousCursorPoint.x - event.clientX;
+            this._el.annotationLayer.scrollTop = this._el.annotationLayer.scrollTop + this._previousCursorPoint.y - event.clientY;
+
+            this._previousCursorPoint = {
+                x: event.clientX,
+                y: event.clientY
+            }
+        }
     }
 
     /**
@@ -203,6 +245,7 @@ export default class Editor extends EventEmitter {
      */
     _onShapeActivate(shapeEditor) {
         this._activateShapeEditor(shapeEditor);
+        this.showAnnotation(shapeEditor.shape);
     }
 
     /**
@@ -212,16 +255,13 @@ export default class Editor extends EventEmitter {
     _onShapeUpdate(shapeEditor) {
         this.emit('shapes:update', this.shapes);
         this.hideAnnotation();
-        this.showAnnotation(shapeEditor.shape);
     }
 
     /**
      * @param {BaseShapeEditor} shapeEditor
      * @private
      */
-    _onShapeFocus(shapeEditor) {
-        this.showAnnotation(shapeEditor.shape);
-    }
+    _onShapeFocus(shapeEditor) {}
 
     /**
      * @param {BaseNewShapeEditor} newShapeEditor
