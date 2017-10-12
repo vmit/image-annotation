@@ -35,8 +35,13 @@ export default class Editor extends EventEmitter {
      * @param {number} zoom - level in percentages, min: 20%, max: 1000%, the value is clamped
      */
     set zoom(zoom) {
+        const previousScrollTopPosition = this._el.annotationLayer.scrollTop / this._el.annotationLayer.scrollHeight;
+        const previousScrollLeftPosition = this._el.annotationLayer.scrollLeft / this._el.annotationLayer.scrollWidth;
+
         this._zoom = Math.min(Math.max(zoom, 20), 1000);
         this._el.container.style.width = `${this._zoom}%`;
+        this._el.annotationLayer.scrollTop = previousScrollTopPosition * this._el.annotationLayer.scrollHeight;
+        this._el.annotationLayer.scrollLeft = previousScrollLeftPosition * this._el.annotationLayer.scrollWidth;
         this._shapeEditors.forEach((shapeEditor) => shapeEditor.rerender());
         this._activeShapeEditor && this._activeShapeEditor.rerender();
         this.hideAnnotation();

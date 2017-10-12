@@ -38,11 +38,13 @@ export default class PolygonEditor extends BaseShapeEditor {
         }
 
         switch (key) {
-            case 'd':
+            case 'D':
                 if (this._el.activePoint) {
                     this._removePoint(this._el.activePoint);
-                    break;
+                } else {
+                    this.removeFromCanvas();
                 }
+                break;
             case 'ArrowUp':
                 this._updateActivePointByArrowKey('y', pointMoveYGap * -1);
                 break;
@@ -54,6 +56,17 @@ export default class PolygonEditor extends BaseShapeEditor {
                 break;
             case 'ArrowRight':
                 this._updateActivePointByArrowKey('x', pointMoveXGap);
+                break;
+            case 'Tab':
+                if (this._el.activePoint) {
+                    const index = this._el.points.indexOf(this._el.activePoint);
+
+                    if (shiftKey) {
+                        this._activatePoint(this._el.points[index-1] || this._el.points[this._el.points.length - 1]);
+                    } else {
+                        this._activatePoint(this._el.points[index+1] || this._el.points[0]);
+                    }
+                }
                 break;
             default:
                 super.onKeyPressed(key, altKey, shiftKey);

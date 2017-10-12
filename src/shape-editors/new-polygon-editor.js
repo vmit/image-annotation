@@ -23,11 +23,11 @@ export default class NewPolygonEditor extends BaseNewShapeEditor {
      */
     onKeyPressed(key, altKey, shiftKey) {
         switch (key) {
-            case 'z':
-            case 'd':
+            case 'Z':
+            case 'D':
                 this._removeLastPoint();
                 break;
-            case 'c':
+            case 'C':
                 this._closePolygon();
                 break;
             default:

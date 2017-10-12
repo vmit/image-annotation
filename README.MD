@@ -31,12 +31,14 @@ TODO
 
 ### Hotkeys
 
-- `d` remove active shape
+- `D` remove active shape
 
 ##### Polygon:
-- `c` close polygon
-- `d` `z` remove active or last active point
-- `Up` move up active point along the X-axis(`alt+Up` smaller amount, `alt+shift+Up` bigger amount)
-- `Down` move down active point along the X-axis(`alt+Down` smaller amount, `alt+shift+Down` bigger amount)
-- `Left` move left active point along the Y-axis(`alt+Left` smaller amount, `alt+shift+Left` bigger amount)
-- `Right` move right active point along the Y-axis(`alt+Right` smaller amount, `alt+shift+Right` bigger amount)
+- `C` close polygon
+- `D` `Z` remove active or last active point
+- `Tab` activate the next point
+- `Shift+Tab` activate the previous point
+- `Up` move up active point along the Y-axis(`ALT+Up` smaller amount, `ALT+Shift+Up` bigger amount)
+- `Down` move down active point along the Y-axis(`ALT+Down` smaller amount, `ALT+Shift+Down` bigger amount)
+- `Left` move left active point along the X-axis(`ALT+Left` smaller amount, `ALT+Shift+Left` bigger amount)
+- `Right` move right active point along the X-axis(`ALT+Right` smaller amount, `ALT+Shift+Right` bigger amount)

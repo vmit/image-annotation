@@ -118,7 +118,7 @@ export default class BaseShapeEditor extends EventEmitter {
      */
     onKeyPressed(key, altKey, shiftKey) {
         switch (key) {
-            case 'd':
+            case 'D':
                 this.removeFromCanvas();
                 break;
         }
@@ -171,8 +171,15 @@ export default class BaseShapeEditor extends EventEmitter {
         container.el.addEventListener('mouseenter', throttle(this.emit.bind(this, 'shape:editor:focus', this), 100, { trailing: false }));
         container.el.addEventListener('keydown', (e) => {
             e.preventDefault();
+            e.stopPropagation();
 
-            this.onKeyPressed(e.key, e.altKey, e.shiftKey);
+            let key = e.key;
+            // letter keys
+            if (e.keyCode > 64 && e.keyCode < 91) {
+                key = String.fromCharCode(e.keyCode);
+            }
+
+            this.onKeyPressed(key, e.altKey, e.shiftKey);
         });
 
         return container;
