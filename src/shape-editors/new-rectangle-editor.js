@@ -37,6 +37,8 @@ export default class NewRectangleEditor extends BaseNewShapeEditor {
     }
 
     _onMouseMove(event) {
+        event.stopPropagation();
+
         if (this._isAnchorPointSet) {
             const point = {
                 x: normalizeX(event.clientX, this.canvasSize),
