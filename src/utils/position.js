@@ -1,5 +1,9 @@
+import clamp from 'lodash/clamp';
+
 function _round(value) {
-    return Math.round(value * 1000) / 1000;
+    const accuracy = 100000;
+
+    return clamp(Math.round(value * accuracy) / accuracy, 0, 100);
 }
 
 export function normalizeX(clientX, canvasPosition) {
